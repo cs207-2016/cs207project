@@ -21,4 +21,14 @@ class TimeSeries():
 
     def __setitem__(self, key, value):
         self._data[key] = value
-        
+
+    def __repr__(self):
+        class_name = type(self).__name__
+        if len(self)==0:
+            components=""
+        else:
+            components = self._data[0]
+        return '{}([{},...])'.format(class_name, components)
+
+    def __str__(self):
+        return(str(self._data))
