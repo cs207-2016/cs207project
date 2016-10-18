@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
 
-# Stores a single, ordered set of numerical data
 class TimeSeries():
-
+    ''' A series of data points indexed by time.'''
+    
     def __init__(self, seq):
-
-        # raise an exception if `seq` is not a sequence
+        '''Creates a TimeSeries using the data points in `seq`.
+        
+        Args:
+            seq (:obj:`sequence` of `numeric`): A sequence of data points indexed by time.
+                Time intervals are assumed to be uniform.
+                
+        Example:
+            >>> ts = TimeSeries([1, 2, 3, 4])
+            >>> ts
+            TimeSeries([1,...])
+        '''
+        # raise an exception if `seq` is not iterable
         try:
             iter(seq)
         except:
             raise TypeError('`seq` must be a sequence')
 
-        self._data = sorted(seq)
+        self._data = list(seq)
 
     def __len__(self):
         return len(self._data)
@@ -31,4 +41,5 @@ class TimeSeries():
         return '{}([{},...])'.format(class_name, components)
 
     def __str__(self):
+        '''Returns the sequence of data points contained in the TimeSeries.'''
         return(str(self._data))
