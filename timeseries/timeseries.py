@@ -43,3 +43,16 @@ class TimeSeries():
     def __str__(self):
         '''Returns the sequence of data points contained in the TimeSeries.'''
         return(str(self._data))
+    
+    def __iter__(self):
+        return iter(self._data)
+    
+    def itertimes(self):
+        '''Returns the time indices for the TimeSeries data points'''
+        times = range(len(self._data))
+        return iter(times)
+    
+    def iteritems(self):
+        '''Returns a tuple (time, value) for each item in the TimeSeries.'''
+        times = range(len(self._data))
+        return iter(zip(times, self._data))
