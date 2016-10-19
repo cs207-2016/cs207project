@@ -23,8 +23,8 @@ class TimeSeries():
         except:
             raise TypeError('`seq` must be a sequence')
 
-        self._data = np.array(seq)
-
+        self._data = list(seq)
+        
     def __len__(self):
         return len(self._data)
 
@@ -61,41 +61,63 @@ class TimeSeries():
 
 class ArrayTimeSeries(TimeSeries):
     
-    def __init__(self, seq):
+    def __init__(self, times, seq):
         '''Creates a TimeSeries using the data points in `seq`.
         Internally, this subclass uses a numpy array for storage
         instead of a Python list.
 
         Args:
+            times (:obj:`sequence` of `numeric): A sequence of times,
+            each associated with a value of `seq` at same index.
+            
             seq (:obj:`sequence` of `numeric`): A sequence of data 
-            points indexed by time. Time intervals are assumed to be uniform.
-
+            points associated with corresponding index in `times`. 
+                
         Example:
             >>> ts = TimeSeries([1, 2, 3, 4])
             >>> ts
             TimeSeries([1,...])
         '''
-        # raise an exception if `seq` is not iterable
-        try:
-            iter(seq)
-        except:
-            raise TypeError('`seq` must be a sequence')
-            
+        # raise an exception if parameters are not iterable
+        for s in [times, seq]:
+            try:
+                iter(s)
+            except:
+                raise TypeError('Both constructor parameters must be sequences.')
+        
+        # raise an exception if `times` and `seq` are not of equal length
+        if len(times) != len(seq): 
+            raise ValueError('Both constructor parameters must have the same length.')
+                
         # _length (int): The TimeSeries length / first empty index in the array
         self._length = len(seq)
 
-        # Initialize array to twice the length of the sequence
+        # Initialize array to twice the length of the sequence (room for future data)
         self._data = np.empty(len(seq) * 2)
+        self._times = np.empty(len(seq) * 2)
         self._data[:self._length] = seq
+        self._times[:self._length] = times
        
     def __len__(self):
         return self._length
 
+    def __repr__(self):
+        format_str = '{}([{}])'
+        row_str = '[{}\t{}]'
+        add_str = ''
+        
+        for i in range(self._length):
+            add_str += row_str.format(self._times[i], self._data[i]) 
+            if i != self._length - 1: add_str += '\n'
+
+        class_name = type(self).__name__
+        return format_str.format(class_name, add_str)
+                                                               
     def __getitem__(self, key):
         if key >= self._length:
             raise IndexError('TimeSeries index out of range.')
         return self._data[key]
-
+    
     def __setitem__(self, key, value):
         if key >= self._length:
             raise IndexError('TimeSeries index out of range.')
@@ -106,9 +128,8 @@ class ArrayTimeSeries(TimeSeries):
     
     def itertimes(self):
         '''Returns an iterator over the time indices for the TimeSeries.'''
-        return iter(range(self._length))
+        return iter(self._times[:self._length])
     
     def iteritems(self):
         '''Returns an iterator over the tuples (time, value) for each item in the TimeSeries.'''
-        times = range(self._length)
-        return iter(zip(times, self._data[:self._length]))        
+        return iter(zip(self._times[:self._length], self._data[:self._length]))        
