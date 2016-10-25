@@ -29,3 +29,11 @@ def lazy(function):
     def create_thunk(*args, **kwargs):
         return LazyOperation(function, *args, **kwargs)
     return create_thunk
+
+@lazy
+def lazy_add(a,b):
+     return a+b
+
+@lazy
+def lazy_mul(a,b):
+     return a*b
