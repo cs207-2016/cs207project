@@ -64,7 +64,7 @@ class TimeSeries():
         for i in interpts:
             times = sorted(enumerate(self._times), key=lambda x:abs(x[1]-i))[:2]
             vals = [self._data[times[0][0]], self._data[times[1][0]]]
-            new_val = vals[0] + (vals[0]-vals[1])/(times[0][1]-times[1][1])
+            new_val = vals[0] + (i-times[0][1])*(vals[1]-vals[0])/(times[1][1]-times[0][1])
             times.append(i)
             seq.append(new_val)
         return TimeSeries(times,seq)
