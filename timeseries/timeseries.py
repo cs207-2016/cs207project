@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import math
+import numbers
 from lazy import *
 
 class TimeSeries():
@@ -71,7 +73,7 @@ class TimeSeries():
         return TimeSeries(times,seq)
 
     def __abs__(self):
-        return [abs(x) for x in self.iteritems]
+        return math.sqrt(sum(x * x for x in self))
 
     def __bool__(self):
         return bool(abs(self))
@@ -79,7 +81,7 @@ class TimeSeries():
     def _check_time_values(function):
         def _check_time_values_helper(self , rhs):
             try:
-                if not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes()) ):
+                if not all(t1 == t2 for t1, t2 in zip(self._times, rhs._times)):
                     raise ValueError(str(self)+' and '+str(rhs)+' must have the same points')
                 return function(self,rhs)
             except AttributeError:
@@ -87,39 +89,39 @@ class TimeSeries():
         return _check_time_values_helper
 
     def __neg__(self):
-        return Vector(-x for x in self.iteritems) 
+        return TimeSeries(self._times, [-x for x in self._data])
     
     def __pos__(self):
-        return Vector(self)
+        return TimeSeries(self._times, self._data)
 
     @_check_time_values
     def __eq__(self, other):
         if isinstance(other, numbers.Real):
-            return (all(val1 == numbers.Real for val1 in self.iteritems()))
+            return (all(val1 == numbers.Real for val1 in self._data))
         else:
-            return (all(val1 == val2 for val1, val2 in zip(self.iteritems(), other.iteritems())))
+            return (all(val1 == val2 for val1, val2 in zip(self._data, other._data)))
 
     @_check_time_values
-    def __pos__(self, other):
+    def __add__(self, other):
         if isinstance(other, numbers.Real):
-            return [x + other for x in self.iteritems()]
+            return TimeSeries(self._times, [x + other for x in self._data])
         else:
-            return [x+y for x, y in zip(self.iteritems(), other.iteritems())]
+            return TimeSeries(self._times, [x+y for x, y in zip(self._data, other._data)])
 
     # Implements lhs - rhs
     @_check_time_values
-    def __neg__(self, other):
+    def __sub__(self, other):
         if isinstance(other, numbers.Real):
-            return [x - other for x in self.iteritems()]
+            return TimeSeries(self._times, [x-other for x in self._data])
         else:
-            return [x-y for x, y in zip(self.iteritems(), other.iteritems())]
+            return TimeSeries(self._times, [x-y for x, y in zip(self._data, other._data)])
     
     @_check_time_values
     def __mul__(self, other):
         if isinstance(other, numbers.Real):
-            return [x*other for x in self.iteritems()]
+            return TimeSeries(self._times, [x*other for x in self._data])
         else:
-            return [x*y for x, y in zip(self.iteritems(), other.iteritems())]
+            return TimeSeries(self._times, [x*y for x, y in zip(self._data, other._data)])
     
         
 
