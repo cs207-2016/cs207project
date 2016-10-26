@@ -55,14 +55,11 @@ class TimeSeries():
 
     def itertimes(self):
         '''Returns the time indices for the TimeSeries data points'''
-        ##Ant Change
-        #return iter(self._times[:self._length])
+
         return iter(self._times[:len(self)])
 
     def iteritems(self):
         '''Returns a tuple (time, value) for each item in the TimeSeries.'''
-        ## Ant Change
-        #return iter(zip(self._times[:self._length], self._data[:self._length]))
         return iter(zip(self._times[:len(self)], self._data[:len(self)]))
 
     def interpolate(self, interpts):
@@ -74,8 +71,6 @@ class TimeSeries():
             new_val = vals[0] + (i-times[0][1])*(vals[1]-vals[0])/(times[1][1]-times[0][1])
             times.append(i)
             seq.append(new_val)
-        ## Ant Change
-        #return TimeSeries(times,seq)
         return TimeSeries(interpts,seq)
 
     def __abs__(self):
