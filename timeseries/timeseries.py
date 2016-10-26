@@ -95,7 +95,7 @@ class TimeSeries():
     @_check_time_values
     def __eq__(self, other):
         if isinstance(other, numbers.Real):
-            return (all(val1 == numbers.Real for val1 self.iteritems))
+            return (all(val1 == numbers.Real for val1 in self.iteritems))
         else:
             return (all(val1 == val2 for val1, val2 in zip(self.iteritems, other.iteritems)))
 
