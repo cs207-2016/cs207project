@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+from lazy import *
 
 class TimeSeries():
     ''' A series of data points indexed by time.'''
@@ -69,7 +70,10 @@ class TimeSeries():
             seq.append(new_val)
         return TimeSeries(seq,times)
 
-    ##DEFINE __EQ__
+    @property
+    def lazy(self):
+        return LazyOperation(lambda x: x, self)
+    
 
 
 class ArrayTimeSeries(TimeSeries):
@@ -146,3 +150,6 @@ class ArrayTimeSeries(TimeSeries):
     def iteritems(self):
         '''Returns an iterator over the tuples (time, value) for each item in the TimeSeries.'''
         return iter(zip(self._times[:self._length], self._data[:self._length]))
+
+
+
