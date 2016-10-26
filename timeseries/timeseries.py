@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+from lazy import *
 
 class TimeSeries():
     ''' A series of data points indexed by time.'''
@@ -24,7 +25,7 @@ class TimeSeries():
             raise TypeError('`seq` must be a sequence')
 
         self._data = list(seq)
-        self._times = range(len(seq))
+        self._times = list(times)
 
     def __len__(self):
         return len(self._data)
@@ -62,12 +63,12 @@ class TimeSeries():
         times = []
         seq = []
         for i in interpts:
-            vals = sorted(enumerate(self._data), key=lambda x:abs(x[1]-i))[:2]
-            times = [self._times[vals[0][0]], self._times[vals[1][0]]]
-            new_val = vals[0][1] + (vals[0][1]-vals[1][1])/(times[0]-times[1])
+            times = sorted(enumerate(self._times), key=lambda x:abs(x[1]-i))[:2]
+            vals = [self._data[times[0][0]], self._data[times[1][0]]]
+            new_val = vals[0] + (i-times[0][1])*(vals[1]-vals[0])/(times[1][1]-times[0][1])
             times.append(i)
             seq.append(new_val)
-        return TimeSeries(seq,times)
+        return TimeSeries(times,seq)
 
     def __abs__(self):
         return [abs(x) for x in self.iteritems]
@@ -123,6 +124,12 @@ class TimeSeries():
         
 
     ##DEFINE __EQ__
+
+    @property
+    def lazy(self):
+        return LazyOperation(lambda x: x, self)
+    
+
 
 
 class ArrayTimeSeries(TimeSeries):
@@ -201,3 +208,7 @@ class ArrayTimeSeries(TimeSeries):
         return iter(zip(self._times[:self._length], self._data[:self._length]))
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5eb5db75244963199ef1b3987203e553450dd4c4
