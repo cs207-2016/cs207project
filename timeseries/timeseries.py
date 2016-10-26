@@ -69,6 +69,59 @@ class TimeSeries():
             seq.append(new_val)
         return TimeSeries(seq,times)
 
+    def __abs__(self):
+        return [abs(x) for x in self.iteritems]
+
+    def __bool__(self):
+        return bool(abs(self))
+
+    def _check_time_values(function):
+        def _check_time_values_helper(self , rhs):
+            try:
+                if not all(t1 == t2 for t1, t2 in zip(self.itertimes, rhs.itertimes) ):
+                    raise ValueError(str(self)+' and '+str(rhs)+' must have the same points')
+                return function(self,rhs)
+            except AttributeError:
+                raise NotImplemented
+        return _check_time_values_helper
+
+    def __neg__(self):
+        return Vector(-x for x in self.iteritems) 
+    
+    def __pos__(self):
+        return Vector(self)
+
+    @_check_time_values
+    def __eq__(self, other):
+        if isinstance(other, numbers.Real):
+            return (all(val1 == numbers.Real for val1 self.iteritems))
+        else:
+            return (all(val1 == val2 for val1, val2 in zip(self.iteritems, other.iteritems)))
+
+    @_check_time_values
+    def __pos__(self, other):
+        if isinstance(other, numbers.Real):
+            return [x + other for x in self.iteritems]
+        else:
+            return [x+y for x, y in zip(self.iteritems, other.iteritems)]
+
+    # Implements lhs - rhs
+    @_check_time_values
+    def __neg__(self, other):
+        if isinstance(other, numbers.Real):
+            return [x - other for x in self.iteritems]
+        else:
+            return [x-y for x, y in zip(self.iteritems, other.iteritems)]
+    
+    @_check_time_values
+    def __mul__(self, other):
+        if isinstance(other, numbers.Real):
+            return [x*other for x in self.iteritems]
+        else:
+            return [x*y for x, y in zip(self.iteritems, other.iteritems)]
+    
+        
+
     ##DEFINE __EQ__
 
 
@@ -146,3 +199,5 @@ class ArrayTimeSeries(TimeSeries):
     def iteritems(self):
         '''Returns an iterator over the tuples (time, value) for each item in the TimeSeries.'''
         return iter(zip(self._times[:self._length], self._data[:self._length]))
+
+
