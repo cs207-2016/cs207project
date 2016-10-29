@@ -1,2 +1,2 @@
 ./timeseries/__pycache__
-
+*.pyc
