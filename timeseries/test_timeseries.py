@@ -115,3 +115,42 @@ def test_neg():
     ts2 = TimeSeries([1,2,3,4],[-100,-101,-102,-103])
     assert -ts == ts2
 
+
+'''
+Functions Being Tested: pos
+Summary: Basic ps test
+'''
+def test_pos():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = +ts
+    assert ts == ts2
+
+
+'''
+Functions Being Tested: add
+Summary: Basic add test
+'''
+def test_add():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[200,202,204,206])
+    assert ts2 == (ts+ts)
+
+'''
+Functions Being Tested: sub
+Summary: Basic sub test
+'''
+def test_sub():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[0,0,0,0])
+    assert ts2 == (ts-ts)
+
+'''
+Functions Being Tested: sub
+Summary: Basic sub test
+'''
+def test_mult():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[2,2,2,2])
+    ts3 = TimeSeries([1,2,3,4],[200,202,204,206])
+    assert ts3 == (ts*ts2)
+
