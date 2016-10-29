@@ -106,4 +106,12 @@ def test_eq2():
     ts2 = TimeSeries([1,2,3,4],[100,101,102,104])
     assert ts != ts2
 
+'''
+Functions Being Tested: neg
+Summary: Basic neg test
+'''
+def test_neg():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[-100,-101,-102,-103])
+    assert -ts == ts2
 
