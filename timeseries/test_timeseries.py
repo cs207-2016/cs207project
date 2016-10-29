@@ -87,3 +87,14 @@ Summary: Interpolate Boundary Scenario
 def test_interpolate_boundary():
     a = TimeSeries([0,5,10], [1,2,3])
     a.interpolate([-100,100]) == TimeSeries([-100,100],[1,3])
+
+'''
+Functions Being Tested: eq
+Summary: Basic eq Test (true)
+'''
+def test_eq():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[100,101,102,103])
+    assert ts == ts2
+
+
