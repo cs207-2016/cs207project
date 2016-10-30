@@ -26,6 +26,21 @@ import numpy as np
 import math
 import numbers
 from lazy import *
+import abc
+
+class TimeSeriesInterface(abc.ABC):
+
+    @abc.abstractmethod
+    def __iter__(self):
+       '''Iterate over data in TimeSeries'''
+
+    @abc.abstractmethod
+    def iteritems(self):
+        '''Iterate over (time, data)'''
+
+    @abc.abstractmethod
+    def itertimes(self):
+        '''Iterate over times'''
 
 class TimeSeries():
     ''' A series of data points indexed by time.'''
@@ -133,7 +148,7 @@ class TimeSeries():
 
     def __neg__(self):
         return TimeSeries(self._times, [-x for x in self._data])
-    
+
     def __pos__(self):
         return TimeSeries(self._times, self._data)
 
@@ -158,22 +173,22 @@ class TimeSeries():
             return TimeSeries(self._times, [x-other for x in self._data])
         else:
             return TimeSeries(self._times, [x-y for x, y in zip(self._data, other._data)])
-    
+
     @_check_time_values
     def __mul__(self, other):
         if isinstance(other, numbers.Real):
             return TimeSeries(self._times, [x*other for x in self._data])
         else:
             return TimeSeries(self._times, [x*y for x, y in zip(self._data, other._data)])
-    
-        
+
+
 
     ##DEFINE __EQ__
 
     @property
     def lazy(self):
         return LazyOperation(lambda x: x, self)
-    
+
 
 
 
@@ -252,8 +267,53 @@ class ArrayTimeSeries(TimeSeries):
         '''Returns an iterator over the tuples (time, value) for each item in the ArrayTimeSeries.'''
         return iter(zip(self._times[:self._length], self._data[:self._length]))
 
+class StreamTimeSeriesInterface(TimeSeriesInterface):
+    '''Creates an interface for a Timeseries with no internal storage that
+    yields data based on a generator '''
 
+    @abc.abstractmethod
+    def produce(self)->list:
+        "intersection with another set"
 
+class SimulatedTimeSeries(StreamTimeSeriesInterface):
 
+    def __init__(self, generator):
+        '''Creates a TimeSeries using a generator that creates tuples of (time, value)
+        Internally, this subclass has no storage.
 
+        Args:
+            generator (:obj:`sequence` of `numeric): A sequence of (time, value) tuples.
 
+        Example:
+            >>> ts = TimeSeries(generator)
+            >>> ts
+            SimulatedTimeSeries([<generator object make_data at 0x1091183b8>])
+        '''
+
+        self._gen = generator
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return self.produce()
+
+    def iteritems(self):
+        return self.produce()[1]
+
+    def itertimes(self):
+        return self.produce()[0]
+
+    def __repr__(self):
+        format_str = '{}([{}])'
+
+        class_name = type(self).__name__
+        return format_str.format(class_name, str(self._gen))
+
+    def produce(self, chunk=1):
+        for i in range(chunk):
+            value = next(self._gen)
+            if type(value) == tuple:
+                return value
+            else:
+                return (datetime.datetime.now(), value)
