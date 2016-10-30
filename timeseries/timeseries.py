@@ -1,3 +1,25 @@
+''''
+
+Authors:
+Sophie Hilgard
+Ryan Lapcevic
+Anthony Soroka
+Ariel Herbert-Voss
+Yamini Bansal
+
+Date: 15 Oct 2016
+Course: Project CS 207
+Document: test_timeseries.py
+Summary: Testing Timeseries Class
+
+Example:
+    Example how to run this test
+        $ source activate py35
+        $ py.test test_timeseries.py
+
+'''
+
+
 #!/usr/bin/env python3
 
 import numpy as np
@@ -9,22 +31,28 @@ class TimeSeries():
     ''' A series of data points indexed by time.'''
 
     def __init__(self, times, seq):
-        '''Creates a TimeSeries using the data points in `seq`.
+        '''Creates a TimeSeries using the data points in `seq` and time points time.
 
         Args:
             seq (:obj:`sequence` of `numeric`): A sequence of data points indexed by time.
-                Time intervals are assumed to be uniform.
+            time (:obj:`sequence` of `numeric`): A sequence of time points
+                
 
         Example:
-            >>> ts = TimeSeries([1, 2, 3, 4])
+            >>> ts = TimeSeries([1, 2, 3, 4],[100,101,102,103])
             >>> ts
-            TimeSeries([1,...])
+            TimeSeries([100,...])
         '''
         # raise an exception if `seq` is not iterable
         try:
             iter(seq)
         except:
             raise TypeError('`seq` must be a sequence')
+
+        # raise an exception if `times` and `seq` are not of equal length
+        if len(list(times)) != len(list(seq)):
+            raise ValueError('Both constructor parameters must have the same length.')
+        
 
         self._data = list(seq)
         self._times = list(times)
@@ -63,15 +91,29 @@ class TimeSeries():
         return iter(zip(self._times[:len(self)], self._data[:len(self)]))
 
     def interpolate(self, interpts):
-        times = []
+        
+        #Anthony Amended this
+        #times = []
+        
         seq = []
+        timeRecord = []
         for i in interpts:
             times = sorted(enumerate(self._times), key=lambda x:abs(x[1]-i))[:2]
             vals = [self._data[times[0][0]], self._data[times[1][0]]]
             new_val = vals[0] + (i-times[0][1])*(vals[1]-vals[0])/(times[1][1]-times[0][1])
-            times.append(i)
+            
+            #Anthony removed this
+            #times.append(i)
+            
             seq.append(new_val)
-        return TimeSeries(interpts,seq)
+            timeRecord.append(i)
+
+        #Anthony amended this
+        #return TimeSeries(interpts,seq)
+
+        return TimeSeries(timeRecord,seq)
+
+
 
     def __abs__(self):
         return math.sqrt(sum(x * x for x in self))
@@ -136,23 +178,23 @@ class TimeSeries():
 
 
 class ArrayTimeSeries(TimeSeries):
+    ''' A series of data points indexed by time developed using Numpy.'''
 
     def __init__(self, times, seq):
-        '''Creates a TimeSeries using the data points in `seq`.
-        Internally, this subclass uses a numpy array for storage
-        instead of a Python list.
+        '''Creates a TimeSeries using the data points in `seq` and time points time.
 
         Args:
-            times (:obj:`sequence` of `numeric): A sequence of times,
-            each associated with a value of `seq` at same index.
-
-            seq (:obj:`sequence` of `numeric`): A sequence of data
-            points associated with corresponding index in `times`.
+            seq (:obj:`sequence` of `numeric`): A sequence of data points indexed by time.
+            time (:obj:`sequence` of `numeric`): A sequence of time points
+                
 
         Example:
-            >>> ts = TimeSeries([1, 2, 3, 4])
-            >>> ts
-            TimeSeries([1,...])
+            >>> ats = ArrayTimeSeries([1, 2, 3, 4],[100,101,102,103])
+            >>> ats
+            ArrayTimeSeries([[1.0   100.0]
+            [2.0    101.0]
+            [3.0    102.0]
+            [4.0    103.0]])
         '''
         # raise an exception if parameters are not iterable
         for s in [times, seq]:
@@ -165,7 +207,7 @@ class ArrayTimeSeries(TimeSeries):
         if len(times) != len(seq):
             raise ValueError('Both constructor parameters must have the same length.')
 
-        # _length (int): The TimeSeries length / first empty index in the array
+        # _length (int): The ArrayTimeSeries length / first empty index in the array
         self._length = len(seq)
 
         # Initialize array to twice the length of the sequence (room for future data)
@@ -191,23 +233,23 @@ class ArrayTimeSeries(TimeSeries):
 
     def __getitem__(self, key):
         if key >= self._length:
-            raise IndexError('TimeSeries index out of range.')
+            raise IndexError('ArrayTimeSeries index out of range.')
         return self._data[key]
 
     def __setitem__(self, key, value):
         if key >= self._length:
-            raise IndexError('TimeSeries index out of range.')
+            raise IndexError('ArrayTimeSeries index out of range.')
         self._data[key] = value
 
     def __iter__(self):
         return iter(self._data[:self._length])
 
     def itertimes(self):
-        '''Returns an iterator over the time indices for the TimeSeries.'''
+        '''Returns an iterator over the time indices for the ArrayTimeSeries.'''
         return iter(self._times[:self._length])
 
     def iteritems(self):
-        '''Returns an iterator over the tuples (time, value) for each item in the TimeSeries.'''
+        '''Returns an iterator over the tuples (time, value) for each item in the ArrayTimeSeries.'''
         return iter(zip(self._times[:self._length], self._data[:self._length]))
 
 

@@ -23,7 +23,7 @@ Example:
 
 
 from pytest import raises
-from timeseries import TimeSeries
+from timeseries import *
 import numpy as np
 import random
 
@@ -35,6 +35,22 @@ Summary: Basic Len Test
 def test_len():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     assert len(ts) == 4
+
+'''
+Functions Being Tested: Init
+Summary: Value error if Time and Data Length don't match
+'''
+def test_init_valueError():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,3,4,5],[100,101,102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if time or data not a seq
+'''
+def test_init_typeError():
+    with raises(TypeError):
+        ts = TimeSeries(3,100)
 
 '''
 Functions Being Tested: getitem
@@ -153,4 +169,52 @@ def test_mult():
     ts2 = TimeSeries([1,2,3,4],[2,2,2,2])
     ts3 = TimeSeries([1,2,3,4],[200,202,204,206])
     assert ts3 == (ts*ts2)
+
+
+### Start of ArrayTimeSeries Tests###
+
+'''
+Functions Being Tested:
+Summary: Basic Len Test
+'''
+def test_len_ats():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    assert len(ats) == 4
+
+
+
+'''
+Functions Being Tested: Init
+Summary: Value error if Time and Data Length don't match
+'''
+def test_init_valueError_ats():
+    with raises(ValueError):
+        ats = ArrayTimeSeries([1,2,3,4,5],[100,101,102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if time or data not a seq
+'''
+def test_init_typeError_Ats():
+    with raises(TypeError):
+        ts = TimeSeries(3,100)
+
+
+'''
+Functions Being Tested: getitem
+Summary: Basic Get Item Test
+'''
+def test_getItem_ats():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    assert ats[3] == 103
+
+'''
+Functions Being Tested: setitem
+Summary: Basic Set Item test
+'''
+def test_setItem_ats():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    ats[2] = 5
+    assert ats[2] == 5
+
 
