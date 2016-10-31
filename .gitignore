@@ -1,2 +1,5 @@
-./timeseries/__pycache__
+*__pycache__
 *.pyc
+*.coverage
+*.cache
+                               

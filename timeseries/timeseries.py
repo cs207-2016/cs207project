@@ -1,25 +1,3 @@
-''''
-
-Authors:
-Sophie Hilgard
-Ryan Lapcevic
-Anthony Soroka
-Ariel Herbert-Voss
-Yamini Bansal
-
-Date: 15 Oct 2016
-Course: Project CS 207
-Document: test_timeseries.py
-Summary: Testing Timeseries Class
-
-Example:
-    Example how to run this test
-        $ source activate py35
-        $ py.test test_timeseries.py
-
-'''
-
-
 #!/usr/bin/env python3
 
 import numpy as np
@@ -42,38 +20,23 @@ class TimeSeriesInterface(abc.ABC):
     def itertimes(self):
         '''Iterate over times'''
 
-class TimeSeries():
-    ''' A series of data points indexed by time.'''
+class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
+    
+    def __init__(self, time_points, data_points):
 
-    def __init__(self, times, seq):
-        '''Creates a TimeSeries using the data points in `seq` and time points time.
-
-        Args:
-            seq (:obj:`sequence` of `numeric`): A sequence of data points indexed by time.
-            time (:obj:`sequence` of `numeric`): A sequence of time points
+        # Raise an exception if any parameter is not a sequence
+        params = {'time_points': time_points,
+                  'data_points': data_points}
+        for p in params:
+            try:
+                iter(params[p])
+            except:
+                raise TypeError('`%s` must be a sequence.' % p)
                 
-
-        Example:
-            >>> ts = TimeSeries([1, 2, 3, 4],[100,101,102,103])
-            >>> ts
-            TimeSeries([100,...])
-        '''
-        # raise an exception if `seq` is not iterable
-        try:
-            iter(seq)
-        except:
-            raise TypeError('`seq` must be a sequence')
-
-        # raise an exception if `times` and `seq` are not of equal length
-        if len(list(times)) != len(list(seq)):
-            raise ValueError('Both constructor parameters must have the same length.')
-        
-
-        self._data = list(seq)
-        self._times = list(times)
-
-    def __len__(self):
-        return len(self._data)
+                
+        # Raise an exception if `time_points` and `data_points` are not the same length
+        if len(list(time_points)) != len(list(data_points)):
+            raise ValueError('`time_points` and `data_points` must have the same length.')
 
     def __getitem__(self, key):
         return self._data[key]
@@ -82,169 +45,128 @@ class TimeSeries():
         self._data[key] = value
 
     def __repr__(self):
-        class_name = type(self).__name__
-        if len(self)==0:
-            components=""
-        else:
-            components = self._data[0]
-        return '{}([{},...])'.format(class_name, components)
+        return str(self)
 
     def __str__(self):
-        '''Returns the sequence of data points contained in the TimeSeries.'''
-        return(str(self._data))
-
-    def __iter__(self):
-        return iter(self._data)
-
-    def itertimes(self):
-        '''Returns the time indices for the TimeSeries data points'''
-
-        return iter(self._times[:len(self)])
-
-    def iteritems(self):
-        '''Returns a tuple (time, value) for each item in the TimeSeries.'''
-        return iter(zip(self._times[:len(self)], self._data[:len(self)]))
-
-    def interpolate(self, interpts):
+        format_str = '{}([{}])'
+        row_str = '[{}\t{}]'
+        add_str = ''
         
-        #Anthony Amended this
-        #times = []
-        
-        seq = []
-        timeRecord = []
-        for i in interpts:
-            times = sorted(enumerate(self._times), key=lambda x:abs(x[1]-i))[:2]
+        for pts in self.iteritems():
+            add_str += row_str.format(pts[0], pts[1])
+        class_name = type(self).__name__
+        return format_str.format(class_name, add_str)
+
+    def interpolate(self, pts):
+        inter_pts = []
+        ts = list(pts)
+        for pt in ts:
+            # Get the two time points bounding `pts`
+            times = sorted(enumerate(self._times), key = lambda x: abs(x[1] - pt))[:2]
             vals = [self._data[times[0][0]], self._data[times[1][0]]]
-            new_val = vals[0] + (i-times[0][1])*(vals[1]-vals[0])/(times[1][1]-times[0][1])
-            
-            #Anthony removed this
-            #times.append(i)
-            
-            seq.append(new_val)
-            timeRecord.append(i)
-
-        #Anthony amended this
-        #return TimeSeries(interpts,seq)
-
-        return TimeSeries(timeRecord,seq)
-
-
+            x = vals[0] + (pt - times[0][1]) * (vals[1] - vals[0]) / (times[1][1] - times[0][1])
+            inter_pts.append(x)
+        return TimeSeries(ts, inter_pts)
 
     def __abs__(self):
-        return math.sqrt(sum(x * x for x in self))
+        return math.sqrt(sum(x**2 for x in self))
 
     def __bool__(self):
         return bool(abs(self))
 
     def _check_time_values(function):
         def _check_time_values_helper(self , rhs):
+            print(rhs)
             try:
+<<<<<<< HEAD
+                if isinstance(rhs, numbers.Real): 
+                    return function(self, rhs)
+                elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
+                    raise ValueError('Both time series must have the same time points.')
+                return function(self, rhs)
+=======
                 if len(self._times)!=len(rhs._times) or not all(t1 == t2 for t1, t2 in zip(self._times, rhs._times)):
                     raise ValueError(str(self)+' and '+str(rhs)+' must have the same points')
                 return function(self,rhs)
+>>>>>>> ce48486ded2ac12e986338efdf4067fd7d265e1a
             except AttributeError:
                 raise NotImplemented
         return _check_time_values_helper
 
     def __neg__(self):
-        return TimeSeries(self._times, [-x for x in self._data])
+        # TODO: Create instance of calling class instead of TimeSeries
+        return TimeSeries(list(self.itertimes()), [-x for x in iter(self)])
 
     def __pos__(self):
-        return TimeSeries(self._times, self._data)
+        # TODO: Create instance of calling class instead of TimeSeries
+        return TimeSeries(list(self.itertimes()), list(iter(self)))
 
     @_check_time_values
     def __eq__(self, other):
         if isinstance(other, numbers.Real):
-            return (all(val1 == numbers.Real for val1 in self._data))
+            return (all(x == numbers.Real for x in iter(self)))
         else:
-            return (all(val1 == val2 for val1, val2 in zip(self._data, other._data)))
+            return (all(x == y for x, y in zip(iter(self), iter(other))))
 
     @_check_time_values
     def __add__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(self._times, [x + other for x in self._data])
+            return TimeSeries(list(self.itertimes()), [x + other for x in iter(self)])
         else:
-            return TimeSeries(self._times, [x+y for x, y in zip(self._data, other._data)])
+            return TimeSeries(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
 
-    # Implements lhs - rhs
     @_check_time_values
     def __sub__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(self._times, [x-other for x in self._data])
+            return TimeSeries(list(self.itertimes()), [x - other for x in iter(self)])
         else:
-            return TimeSeries(self._times, [x-y for x, y in zip(self._data, other._data)])
+            return TimeSeries(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __mul__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(self._times, [x*other for x in self._data])
+            return TimeSeries(list(self.itertimes()), [x * other for x in iter(self)])
         else:
-            return TimeSeries(self._times, [x*y for x, y in zip(self._data, other._data)])
+            return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
-
-
-    ##DEFINE __EQ__
-
+    
+    def iteritems(self):
+        return iter(zip(self.itertimes(), iter(self)))        
+        
     @property
     def lazy(self):
         return LazyOperation(lambda x: x, self)
+        
+class TimeSeries(SizedContainerTimeSeriesInterface):
+    def __init__(self, time_points, data_points):
+               
+        super().__init__(time_points, data_points)
+        self._times = list(time_points)
+        self._data = list(data_points)
 
+    def __len__(self):
+        return len(self._times)       
+                                                 
+    def __iter__(self):
+        return iter(self._data)
 
-
-
+    def itertimes(self):
+        return iter(self._times)           
+                                                 
 class ArrayTimeSeries(TimeSeries):
-    ''' A series of data points indexed by time developed using Numpy.'''
 
-    def __init__(self, times, seq):
-        '''Creates a TimeSeries using the data points in `seq` and time points time.
+    def __init__(self, time_points, data_points):
 
-        Args:
-            seq (:obj:`sequence` of `numeric`): A sequence of data points indexed by time.
-            time (:obj:`sequence` of `numeric`): A sequence of time points
-                
-
-        Example:
-            >>> ats = ArrayTimeSeries([1, 2, 3, 4],[100,101,102,103])
-            >>> ats
-            ArrayTimeSeries([[1.0   100.0]
-            [2.0    101.0]
-            [3.0    102.0]
-            [4.0    103.0]])
-        '''
-        # raise an exception if parameters are not iterable
-        for s in [times, seq]:
-            try:
-                iter(s)
-            except:
-                raise TypeError('Both constructor parameters must be sequences.')
-
-        # raise an exception if `times` and `seq` are not of equal length
-        if len(times) != len(seq):
-            raise ValueError('Both constructor parameters must have the same length.')
-
-        # _length (int): The ArrayTimeSeries length / first empty index in the array
-        self._length = len(seq)
-
-        # Initialize array to twice the length of the sequence (room for future data)
-        self._data = np.empty(len(seq) * 2)
-        self._times = np.empty(len(seq) * 2)
-        self._data[:self._length] = seq
-        self._times[:self._length] = times
+        super().__init__(time_points, data_points)
+        
+        self._length = len(time_points)
+        self._times = np.empty(self._length * 2)
+        self._data = np.empty(self._length * 2)
+        self._times[:self._length] = time_points
+        self._data[:self._length] = data_points
 
     def __len__(self):
         return self._length
-
-    def __repr__(self):
-        format_str = '{}([{}])'
-        row_str = '[{}\t{}]'
-        add_str = ''
-
-        for i in range(self._length):
-            add_str += row_str.format(self._times[i], self._data[i])
-            if i != self._length - 1: add_str += '\n'
-
-        class_name = type(self).__name__
-        return format_str.format(class_name, add_str)
 
     def __getitem__(self, key):
         if key >= self._length:
@@ -278,18 +200,6 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
 
     def __init__(self, generator):
-        '''Creates a TimeSeries using a generator that creates tuples of (time, value)
-        Internally, this subclass has no storage.
-
-        Args:
-            generator (:obj:`sequence` of `numeric): A sequence of (time, value) tuples.
-
-        Example:
-            >>> ts = TimeSeries(generator)
-            >>> ts
-            SimulatedTimeSeries([<generator object make_data at 0x1091183b8>])
-        '''
-
         self._gen = generator
 
     def __iter__(self):

@@ -73,9 +73,9 @@ def test_setItem():
 Functions Being Tested: str
 Summary: Basic str test
 '''
-def test_str():
-    ts = TimeSeries([1,2,3,4],[100,101,102,103])
-    assert str(ts) == '[100, 101, 102, 103]'
+#def test_str():
+#    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+#    assert str(ts) == '[100, 101, 102, 103]'
 
 '''
 Functions Being Tested: interpolate
