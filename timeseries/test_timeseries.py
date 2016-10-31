@@ -171,6 +171,33 @@ def test_mult():
     assert ts3 == (ts*ts2)
 
 
+'''
+Functions Being Tested: abs
+Summary: Basic abs test
+'''
+def test_abs():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    testAbs =  (100**2+101**2+102**2+103**2)**.5
+    assert testAbs == abs(ts)
+
+
+'''
+Functions Being Tested: bool
+Summary: Basic Bools Test (True)
+'''
+def test_bool():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    assert bool(ts) == True
+
+'''
+Functions Being Tested: bool2
+Summary: Basic Bools Test (False)
+'''
+def test_bool_false():
+    ts = TimeSeries([1,2,3,4],[0,0,0,0])
+    assert bool(ts) == False
+
+
 ### Start of ArrayTimeSeries Tests###
 
 '''
@@ -180,8 +207,6 @@ Summary: Basic Len Test
 def test_len_ats():
     ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
     assert len(ats) == 4
-
-
 
 '''
 Functions Being Tested: Init
@@ -195,7 +220,7 @@ def test_init_valueError_ats():
 Functions Being Tested: Init
 Summary: Value error if time or data not a seq
 '''
-def test_init_typeError_Ats():
+def test_init_typeError_ats():
     with raises(TypeError):
         ts = TimeSeries(3,100)
 
