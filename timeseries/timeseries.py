@@ -139,7 +139,7 @@ class TimeSeries():
     def _check_time_values(function):
         def _check_time_values_helper(self , rhs):
             try:
-                if not all(t1 == t2 for t1, t2 in zip(self._times, rhs._times)):
+                if len(self._times)!=len(rhs._times) or not all(t1 == t2 for t1, t2 in zip(self._times, rhs._times)):
                     raise ValueError(str(self)+' and '+str(rhs)+' must have the same points')
                 return function(self,rhs)
             except AttributeError:
