@@ -78,17 +78,11 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         def _check_time_values_helper(self , rhs):
             print(rhs)
             try:
-<<<<<<< HEAD
                 if isinstance(rhs, numbers.Real): 
                     return function(self, rhs)
                 elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
                     raise ValueError('Both time series must have the same time points.')
                 return function(self, rhs)
-=======
-                if len(self._times)!=len(rhs._times) or not all(t1 == t2 for t1, t2 in zip(self._times, rhs._times)):
-                    raise ValueError(str(self)+' and '+str(rhs)+' must have the same points')
-                return function(self,rhs)
->>>>>>> ce48486ded2ac12e986338efdf4067fd7d265e1a
             except AttributeError:
                 raise NotImplemented
         return _check_time_values_helper
