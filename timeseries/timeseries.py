@@ -8,7 +8,7 @@ import abc
 import datetime
 
 class TimeSeriesInterface(abc.ABC):
-
+    
     @abc.abstractmethod
     def __iter__(self):
        '''Iterate over data in TimeSeries'''
@@ -26,17 +26,18 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         '''Raises an exception if either parameter is not a sequence
         or if `time_points` and `data_points` are not the same length'''
 
+        # Raise an exception if any parameter is not a sequence.
         params = {'time_points': time_points,
                   'data_points': data_points}
         for p in params:
             try:
                 iter(params[p])
             except:
-                raise TypeError('`%s` must be a sequence.' % p)
+                raise TypeError('Parameter `%s` must be a sequence type.' % p)
 
         # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
-            raise ValueError('`time_points` and `data_points` must have the same length.')
+            raise ValueError('Parameters `time_points` and `data_points` must have the same length.')
 
         # Raise Exception if a time value is not a real number
         for time in iter(time_points):
@@ -77,7 +78,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         add_str = ''
 
         for pts in self.iteritems():
-            add_str += row_str.format(pts[0], pts[1])
+            add_str += row_str.format(pts[0], pts[1]) + '\n'
         class_name = type(self).__name__
         return format_str.format(class_name, add_str)
 
@@ -90,15 +91,26 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
         Returns:
             A new TimeSeries with the provided times and their interpolated values.'''
+
         inter_pts = []
         ts = list(pts)
-        for pt in ts:
+        for t in ts:
             # Get the two time points bounding `pts`
-            times = sorted(enumerate(self._times), key = lambda x: abs(x[1] - pt))[:2]
-            vals = [self._data[times[0][0]], self._data[times[1][0]]]
-            x = vals[0] + (pt - times[0][1]) * (vals[1] - vals[0]) / (times[1][1] - times[0][1])
-            inter_pts.append(x)
-        return TimeSeries(ts, inter_pts)
+            times = sorted(enumerate(self.itertimes()), key = lambda x: abs(x[1] - t))[:2]
+            print(times)
+            i1, t1 = times[0]
+            i2, t2 = times[1]
+            if t <= t1: 
+                inter_pts.append(self._data[i1])
+            elif t >= t2:
+                inter_pts.append(self._data[i2])
+            else:
+                dt = t2 - t1
+                dy = self._data[i2] - self._data[i1]
+                m = dy / dt
+                y = m * (t - t1) + self._data[i1]
+                inter_pts.append(y)
+        return type(self)(ts, inter_pts)
 
     def __abs__(self):
         '''Returns the two-norm of the value vector of the TimeSeries'''
@@ -124,11 +136,11 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
     def __neg__(self):
         # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), [-x for x in iter(self)])
+        return type(self)(list(self.itertimes()), [-x for x in iter(self)])
 
     def __pos__(self):
         # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), list(iter(self)))
+        return type(self)(list(self.itertimes()), list(iter(self)))
 
     @_check_time_values
     def __eq__(self, other):
@@ -160,9 +172,9 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             with the real number or elementwise addition with the values of the other TimeSeries'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x + other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x + other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __sub__(self, other):
@@ -176,9 +188,9 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             of the real number or elementwise subtraction of the values of the other TimeSeries'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x - other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x - other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __mul__(self, other):
@@ -192,9 +204,9 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             by the real number or elementwise multiplication by the values of the other TimeSeries'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x * other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x * other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
     def mean(self):
         return sum(self.itertimes())/len(self)
