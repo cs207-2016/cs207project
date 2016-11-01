@@ -206,6 +206,17 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         and a function which does nothing and saves them both for later.'''
         return LazyOperation(lambda x: x, self)
 
+    def std(self):
+        '''Returns the standard deviation of the TimeSeries
+
+        Returns:
+            The standard deviation as a float'''
+        s = 0
+        mean = np.mean(list(iter(self)))
+        for i in iter(self):
+            s += (mean - i)**2
+        return math.sqrt(s / len(self))
+
 class TimeSeries(SizedContainerTimeSeriesInterface):
     def __init__(self, time_points, data_points):
         '''Inits a TimeSeries with time_points and data_points.
@@ -275,20 +286,21 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
         '''Generate (time, value) tuples'''
 
     def online_std(self, chunk=1):
-        "Online standard deviation"
-        #A simulated timeseries that gives std
-        n = 0
-        mu = 0
-        dev_accum = 0
-        for i in range(chunk):
-            value = next(self._gen)
-            n += 1
-            delta = value - mu
-            dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
-            mu = mu + delta/n
-            if n > 1:
-                stddev = math.sqrt(dev_accum/(n-1))
-                yield stddev
+        def gen():
+            "Online standard deviation"
+            n = 0
+            mu = 0
+            dev_accum = 0
+            for i in range(chunk):
+                value = next(self._gen)
+                n += 1
+                delta = value - mu
+                dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
+                mu = mu + delta/n
+                if n > 1:
+                    stddev = math.sqrt(dev_accum/(n-1))
+                    yield stddev
+            return SimulatedTimeSeries(gen)
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
     '''Creates a Simulated TimeSeries with no internal storage

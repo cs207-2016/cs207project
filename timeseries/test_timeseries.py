@@ -420,5 +420,13 @@ def test_setItem_ats_IndexError():
     with raises(IndexError):
         ats[5] = 105
 
+'''
+Functions Being Tested: std
+Summary: standard deviation
+'''
+
+def test_std():
+    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
+    assert ts.std() == np.std([10, 11, 12, 13])
 
 
