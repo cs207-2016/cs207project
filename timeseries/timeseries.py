@@ -192,6 +192,10 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
         '''Generate (time, value) tuples'''
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
+    '''Creates a Simulated TimeSeries with no internal storage
+    that yields data from a supplied generator, either with or
+    without times provided'''
+
 
     def __init__(self, generator):
         self._gen = generator
@@ -203,10 +207,12 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         return self.produce()
 
     def iteritems(self):
-        return self.produce()[1]
+        '''Returns an iterable that gets a new item from produce'''
+        yield self.produce()[1]
 
     def itertimes(self):
-        return self.produce()[0]
+        '''Returns an iterable that gets a new time from produce'''
+        yield self.produce()[0]
 
     def __repr__(self):
         format_str = '{}([{}])'
