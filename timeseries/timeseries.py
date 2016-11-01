@@ -197,7 +197,8 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
     def mean(self):
-        return sum(self.itertimes())/len(self)
+        """Returns the mean of the input TimeSeries"""
+        return np.mean(list(iter(self)))
 
     def iteritems(self):
         '''Returns an iterator over the TimeSeries times'''
