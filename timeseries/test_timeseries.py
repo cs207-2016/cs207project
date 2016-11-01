@@ -267,8 +267,6 @@ def test_mult2():
     ts2 = TimeSeries([1,2,3,4],[500,505,510,515])
     assert ts2 == (ts * 5)
 
-
-
 '''
 Functions Being Tested: abs
 Summary: Basic abs test
@@ -420,5 +418,23 @@ def test_setItem_ats_IndexError():
     with raises(IndexError):
         ats[5] = 105
 
+'''
+Functions Being Tested: interpolate and itertimes ATS
+Summary: Interpolate and Itertimes Test
+'''
+def test_interpolate_itertimes_ats():
+     
+    a = ArrayTimeSeries([0,5,10], [1,2,3])
+    b = ArrayTimeSeries([2.5,7.5], [100, -100])
+    assert a.interpolate(b.itertimes()) == ArrayTimeSeries([2.5,7.5], [1.5, 2.5])
+
+
+'''
+Functions Being Tested: interpolate ATS
+Summary: Interpolate Boundary Scenario
+'''
+def test_interpolate_boundary_ats():
+    a = ArrayTimeSeries([0,5,10], [1,2,3])
+    a.interpolate([-100,100]) == ArrayTimeSeries([-100,100],[1,3])
 
 
