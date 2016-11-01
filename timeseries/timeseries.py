@@ -60,7 +60,6 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
     def __setitem__(self, key, value):
         '''Sets the data point from the TimeSeries with index = key to value'''
 
-        self._data[key] = value
         # Raise exception if a value is not a real number
         if not isinstance(value, numbers.Real):
             raise ValueError('`value` must be a real number')
