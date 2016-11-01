@@ -28,6 +28,7 @@ import numpy as np
 import random
 
 
+
 '''
 Functions Being Tested: Len
 Summary: Basic Len Test
@@ -54,6 +55,30 @@ def test_init_valueError():
 
 '''
 Functions Being Tested: Init
+Summary: Value error if time value is not a real number
+'''
+def test_init_valueError_time():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,"hello",4],[100,101,102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if data value is not a real number
+'''
+def test_init_valueError_data():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,3,4],[100,"hello",102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if time value is duplicated
+'''
+def test_init_valueError_dupTime():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,2,4],[100,100,102,103])
+
+'''
+Functions Being Tested: Init
 Summary: Value error if time or data not a seq
 '''
 def test_init_typeError():
@@ -69,6 +94,33 @@ def test_getItem():
     assert ts[3] == 103
 
 '''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for String
+'''
+def test_getItem_TypeError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(TypeError):
+        ts["hello"]
+
+'''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for Float
+'''
+def test_getItem_TypeError3():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(TypeError):
+        ts[52.222]
+
+'''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for Float
+'''
+def test_getItem_IndexError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ts[33]
+
+'''
 Functions Being Tested: setitem
 Summary: Basic Set Item test
 '''
@@ -76,6 +128,15 @@ def test_setItem():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     ts[2] = 5
     assert ts[2] == 5
+
+'''
+Functions Being Tested: setitem
+Summary: ValueError if setting a value that's not a real number
+'''
+def test_setItem_ValueError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(ValueError):
+        ts[0] = "hello"
 
 '''
 Functions Being Tested: str
@@ -349,5 +410,15 @@ def test_sub_notImplemented():
    myList = [1,2,3,4]
    with raises(NotImplementedError):
        ts-myList
+
+'''       
+Functions Being Tested: setitem
+Summary: setItem Index Error
+'''
+def test_setItem_ats_IndexError():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ats[5] = 105
+
 
 
