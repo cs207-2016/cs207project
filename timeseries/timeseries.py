@@ -195,6 +195,9 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         else:
             return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
+    def mean(self):
+        return sum(self.itertimes())/len(self)
+    
     def iteritems(self):
         '''Returns an iterator over the TimeSeries times'''
         return iter(zip(self.itertimes(), iter(self)))
@@ -301,6 +304,19 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
                     stddev = math.sqrt(dev_accum/(n-1))
                     yield stddev
             return SimulatedTimeSeries(gen)
+
+
+def online_mean(self, chunk=1):
+    def gen():
+        n = 0
+        mean = 0
+        for x in self.iteritems():
+            n += 1
+            mean = ((n - 1) * mean + x) / n
+            yield mean
+
+    return SimulatedTimeSeries(gen)
+
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
     '''Creates a Simulated TimeSeries with no internal storage
