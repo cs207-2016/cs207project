@@ -465,8 +465,8 @@ def test_iteritems_sts():
     assert list(sts.iteritems()) == [(1,10)]
 
 '''
-Functions being tested: iteritems
-Summary: Returns an iterator to the next value in the Simulated timeseries
+Functions being tested: itertimes
+Summary: Returns an iterator to the next time value in the Simulated timeseries
 '''
 def test_itertimes_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
@@ -503,7 +503,7 @@ def test_produce_chunk_sts():
 
 '''
 Functions being tested: online_std
-Summary: produce should return 'chunk' values of the SimulatedTimeSeries
+Summary: produce should return 'chunk' values of the online_std SimulatedTimeSeries 
 '''
 def test_std_chunk_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
@@ -511,8 +511,18 @@ def test_std_chunk_sts():
     sts_std = sts.online_std(2)
     assert list(sts_std.produce(2)) == [(1, 0), (2, np.std([10, 11], ddof=1))]
 
-
-
+'''
+Functions being tested: online_std
+Summary: produce should return next 'chunk' values of the online_std SimulatedTimeSeries 
+'''
+def test_std_successive_chunk_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_std = sts.online_std(2)
+    sts_std_first = list(sts_std.produce(2))
+    sts_std = sts.online_std(2)
+    assert list(sts_std.produce(2)) == [(3, 0), (4, np.std([12, 13], ddof=1))]
+    
 
 
     
