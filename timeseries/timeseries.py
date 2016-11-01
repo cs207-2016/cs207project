@@ -123,6 +123,8 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         else:
             return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
+    def mean(self):
+        return sum(self.itertimes())/len(self)
     
     def iteritems(self):
         return iter(zip(self.itertimes(), iter(self)))        
@@ -190,6 +192,9 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
     @abc.abstractmethod
     def produce(self)->list:
         "intersection with another set"
+
+    def online_mean():
+        pass
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
 
