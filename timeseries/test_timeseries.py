@@ -362,7 +362,16 @@ Summary: standard deviation
 def test_std():
     ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
     assert ts.std() == np.std([10, 11, 12, 13])
+    
+'''
+Functions Being Tested: mean
+Summary: mean
+'''
+def test_mean():
+    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
+    assert ts.mean() == np.mean([10, 11, 12, 13])
 
+    
 ### Start of ArrayTimeSeries Tests###
 
 '''
