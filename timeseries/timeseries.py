@@ -7,7 +7,7 @@ from lazy import *
 import abc
 
 class TimeSeriesInterface(abc.ABC):
-
+    
     @abc.abstractmethod
     def __iter__(self):
        '''Iterate over data in TimeSeries'''
@@ -24,19 +24,18 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
     
     def __init__(self, time_points, data_points):
 
-        # Raise an exception if any parameter is not a sequence
+        # Raise an exception if any parameter is not a sequence.
         params = {'time_points': time_points,
                   'data_points': data_points}
         for p in params:
             try:
                 iter(params[p])
             except:
-                raise TypeError('`%s` must be a sequence.' % p)
-                
+                raise TypeError('Parameter `%s` must be a sequence type.' % p)
                 
         # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
-            raise ValueError('`time_points` and `data_points` must have the same length.')
+            raise ValueError('Parameters `time_points` and `data_points` must have the same length.')
 
     def __getitem__(self, key):
         return self._data[key]
@@ -51,22 +50,37 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         format_str = '{}([{}])'
         row_str = '[{}\t{}]'
         add_str = ''
-        
         for pts in self.iteritems():
-            add_str += row_str.format(pts[0], pts[1])
+            add_str += row_str.format(pts[0], pts[1]) + '\n'
         class_name = type(self).__name__
         return format_str.format(class_name, add_str)
 
     def interpolate(self, pts):
+        ''' Returns a list of values from the linear interpolant between the two time points closest to
+            each point in `pts`. If a given time point in `pts` lies outside the range of times covered by the time series,
+            this function returns the closest associated data point instead.
+            
+            Args:
+                `pts`: An iterable of real numbers.'''
         inter_pts = []
         ts = list(pts)
-        for pt in ts:
+        for t in ts:
             # Get the two time points bounding `pts`
-            times = sorted(enumerate(self._times), key = lambda x: abs(x[1] - pt))[:2]
-            vals = [self._data[times[0][0]], self._data[times[1][0]]]
-            x = vals[0] + (pt - times[0][1]) * (vals[1] - vals[0]) / (times[1][1] - times[0][1])
-            inter_pts.append(x)
-        return TimeSeries(ts, inter_pts)
+            times = sorted(enumerate(self.itertimes()), key = lambda x: abs(x[1] - t))[:2]
+            print(times)
+            i1, t1 = times[0]
+            i2, t2 = times[1]
+            if t <= t1: 
+                inter_pts.append(self._data[i1])
+            elif t >= t2:
+                inter_pts.append(self._data[i2])
+            else:
+                dt = t2 - t1
+                dy = self._data[i2] - self._data[i1]
+                m = dy / dt
+                y = m * (t - t1) + self._data[i1]
+                inter_pts.append(y)
+        return type(self)(ts, inter_pts)
 
     def __abs__(self):
         return math.sqrt(sum(x**2 for x in self))
@@ -89,11 +103,11 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
     def __neg__(self):
         # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), [-x for x in iter(self)])
+        return type(self)(list(self.itertimes()), [-x for x in iter(self)])
 
     def __pos__(self):
         # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), list(iter(self)))
+        return type(self)(list(self.itertimes()), list(iter(self)))
 
     @_check_time_values
     def __eq__(self, other):
@@ -105,24 +119,23 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
     @_check_time_values
     def __add__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x + other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x + other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __sub__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x - other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x - other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __mul__(self, other):
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x * other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x * other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
-
+            return type(self)(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
     
     def iteritems(self):
         return iter(zip(self.itertimes(), iter(self)))        
