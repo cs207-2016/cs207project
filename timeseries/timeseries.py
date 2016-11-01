@@ -21,7 +21,7 @@ class TimeSeriesInterface(abc.ABC):
         '''Iterate over times'''
 
 class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
-    
+
     def __init__(self, time_points, data_points):
 
         # Raise an exception if any parameter is not a sequence
@@ -32,8 +32,8 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
                 iter(params[p])
             except:
                 raise TypeError('`%s` must be a sequence.' % p)
-                
-                
+
+
         # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
             raise ValueError('`time_points` and `data_points` must have the same length.')
@@ -51,7 +51,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         format_str = '{}([{}])'
         row_str = '[{}\t{}]'
         add_str = ''
-        
+
         for pts in self.iteritems():
             add_str += row_str.format(pts[0], pts[1])
         class_name = type(self).__name__
@@ -78,7 +78,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         def _check_time_values_helper(self , rhs):
             print(rhs)
             try:
-                if isinstance(rhs, numbers.Real): 
+                if isinstance(rhs, numbers.Real):
                     return function(self, rhs)
                 elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
                     raise ValueError('Both time series must have the same time points.')
@@ -123,36 +123,36 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         else:
             return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
-    
+
     def iteritems(self):
-        return iter(zip(self.itertimes(), iter(self)))        
-        
+        return iter(zip(self.itertimes(), iter(self)))
+
     @property
     def lazy(self):
         return LazyOperation(lambda x: x, self)
-        
+
 class TimeSeries(SizedContainerTimeSeriesInterface):
     def __init__(self, time_points, data_points):
-               
+
         super().__init__(time_points, data_points)
         self._times = list(time_points)
         self._data = list(data_points)
 
     def __len__(self):
-        return len(self._times)       
-                                                 
+        return len(self._times)
+
     def __iter__(self):
         return iter(self._data)
 
     def itertimes(self):
-        return iter(self._times)           
-                                                 
+        return iter(self._times)
+
 class ArrayTimeSeries(TimeSeries):
 
     def __init__(self, time_points, data_points):
 
         super().__init__(time_points, data_points)
-        
+
         self._length = len(time_points)
         self._times = np.empty(self._length * 2)
         self._data = np.empty(self._length * 2)
@@ -189,7 +189,7 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
 
     @abc.abstractmethod
     def produce(self)->list:
-        "intersection with another set"
+        '''Generate (time, value) tuples'''
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
 
@@ -215,6 +215,8 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         return format_str.format(class_name, str(self._gen))
 
     def produce(self, chunk=1):
+        '''Generates up to (time, value) tuples. If optional time is not
+        provided, adds a timestamp to value'''
         for i in range(chunk):
             value = next(self._gen)
             if type(value) == tuple:
