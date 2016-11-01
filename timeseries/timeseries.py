@@ -201,6 +201,7 @@ class TimeSeries(SizedContainerTimeSeriesInterface):
         return len(self._times)
 
     def __iter__(self):
+        '''Returns an iterator over the TimeSeries values'''
         return iter(self._data)
 
     def itertimes(self):
@@ -267,17 +268,18 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         self._gen = generator
 
     def __iter__(self):
+        '''Returns an iterator that gets a new value from produce'''
         return self
 
     def __next__(self):
         return self.produce()[1]
 
     def iteritems(self):
-        '''Returns an iterable that gets a new (time,value) tuple from produce'''
+        '''Returns an iterator that gets a new (time,value) tuple from produce'''
         yield self.produce()
 
     def itertimes(self):
-        '''Returns an iterable that gets a new time from produce'''
+        '''Returns an iterator that gets a new time from produce'''
         yield self.produce()[0]
 
     def __repr__(self):
