@@ -5,6 +5,7 @@ import math
 import numbers
 from lazy import *
 import abc
+import datetime
 
 class TimeSeriesInterface(abc.ABC):
 
@@ -289,22 +290,25 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
         '''Generate (time, value) tuples'''
 
     def online_std(self, chunk=1):
+        "Online standard deviation"
         def gen():
-            "Online standard deviation"
             n = 0
             mu = 0
             dev_accum = 0
             for i in range(chunk):
-                value = next(self._gen)
+                tmp = next(self._gen)
+                (time, value) = (tmp[0], tmp[1])
                 n += 1
                 delta = value - mu
                 dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
                 mu = mu + delta/n
-                if n > 1:
+                if n==1:
+                    stddev = 0
+                    yield (time, stddev)
+                elif n > 1:
                     stddev = math.sqrt(dev_accum/(n-1))
-                    yield stddev
-            return SimulatedTimeSeries(gen)
-
+                    yield (time, stddev)
+        return SimulatedTimeSeries(gen())
 
 def online_mean(self, chunk=1):
     def gen():
@@ -315,7 +319,7 @@ def online_mean(self, chunk=1):
             mean = ((n - 1) * mean + x) / n
             yield mean
 
-    return SimulatedTimeSeries(gen)
+    return SimulatedTimeSeries(gen())
 
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):

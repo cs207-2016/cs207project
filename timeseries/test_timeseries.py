@@ -27,6 +27,7 @@ from timeseries import *
 import numpy as np
 import random
 import math
+import datetime
 
 
 
@@ -446,13 +447,40 @@ def test_interpolate_boundary_ats():
 
 #Simulated timeseries tests begin
 '''
+Functions being tested: next
+Summary: Returns the next value in the Simulated timeseries
+'''
+def test_next_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert next(sts) == 10
+
+'''
+Functions being tested: iteritems
+Summary: Returns an iterator to the next value in the Simulated timeseries
+'''
+def test_iteritems_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.iteritems()) == [(1,10)]
+
+'''
+Functions being tested: iteritems
+Summary: Returns an iterator to the next value in the Simulated timeseries
+'''
+def test_itertimes_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.itertimes()) == [1]
+    
+'''
 Functions being tested: produce
 Summary: produce should return next value of the SimulatedTimeSeries if the input is a tuple
 '''
 def test_produce_sts():
     sts_gen = zip(range(5), range(5))
-    sts = SimulatedTimeSeries(st_gen)
-    assert sts.produce() = (0,0)
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.produce()) == [(0,0)]
 
 '''
 Functions being tested: produce
@@ -460,8 +488,8 @@ Summary: produce should return next value of the SimulatedTimeSeries with a time
 '''
 def test_produce_timestamp_sts():
     sts_gen = iter(range(5))
-    sts = SimulatedTimeSeries(st_gen)
-    assert sts.produce() = (int(datetime.datetime.now().timestamp()), 0)
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.produce()) == [(int(datetime.datetime.now().timestamp()), 0)]
 
 '''
 Functions being tested: produce
@@ -469,18 +497,19 @@ Summary: produce should return 'chunk' values of the SimulatedTimeSeries
 '''
 def test_produce_chunk_sts():
     sts_gen = zip(range(5), range(5))
-    sts = SimulatedTimeSeries(st_gen)
+    sts = SimulatedTimeSeries(sts_gen)
     sts_produced = sts.produce(3)
-    assert list(sts_produced) = [(0,0) (1, 1) (2, 2)]
+    assert list(sts_produced) == [(0,0), (1, 1), (2, 2)]
 
 '''
-Functions being tested: produce
+Functions being tested: online_std
 Summary: produce should return 'chunk' values of the SimulatedTimeSeries
 '''
-def test_std_sts():
-    sts_gen = zip(range(5), range(5))
-    sts = SimulatedTimeSeries(st_gen)
-    assert sts.online_std.produce(2) = np.std([0])
+def test_std_chunk_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_std = sts.online_std(2)
+    assert list(sts_std.produce(2)) == [(1, 0), (2, np.std([10, 11], ddof=1))]
 
 
 
