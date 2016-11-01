@@ -188,6 +188,22 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
     def produce(self)->list:
         "intersection with another set"
 
+    def online_std(self, chunk=1):
+        "Online standard deviation"
+        #A simulated timeseries that gives std
+        n = 0
+        mu = 0
+        dev_accum = 0
+        for i in range(chunk):
+            value = next(self._gen)
+            n += 1
+            delta = value - mu
+            dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
+            mu = mu + delta/n
+            if n > 1:
+                stddev = math.sqrt(dev_accum/(n-1))
+                yield stddev
+
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
 
     def __init__(self, generator):
