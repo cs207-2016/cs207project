@@ -221,7 +221,7 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         return format_str.format(class_name, str(self._gen))
 
     def produce(self, chunk=1):
-        '''Generates up to (time, value) tuples. If optional time is not
+        '''Generates up to chunk (time, value) tuples. If optional time is not
         provided, adds a timestamp to value'''
         for i in range(chunk):
             value = next(self._gen)
