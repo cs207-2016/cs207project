@@ -33,9 +33,25 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
                 iter(params[p])
             except:
                 raise TypeError('`%s` must be a sequence.' % p)
-
+       
+        # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
             raise ValueError('`time_points` and `data_points` must have the same length.')
+
+        # Raise Exception if a time value is not a real number
+        for time in iter(time_points):
+            if not isinstance(time, numbers.Real):
+                raise ValueError('`time_points` must be real numbers')
+
+        # Raise Exception if a data value is not a real number
+        for data in iter(data_points):
+            if not isinstance(data, numbers.Real):
+                raise ValueError('`data_points` must be real numbers')
+
+        # Raise exception if there is a duplicate time value
+        if len(np.unique(list(time_points))) !=len(list(time_points)):
+            raise ValueError('No Duplicate Time Values')
+
 
     def __getitem__(self, key):
         '''Returns the data point from the TimeSeries with index = key'''
@@ -45,6 +61,11 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         '''Sets the data point from the TimeSeries with index = key to value'''
 
         self._data[key] = value
+        # Raise exception if a value is not a real number
+        if not isinstance(value, numbers.Real):
+            raise ValueError('`value` must be a real number')
+        else:
+            self._data[key] = value
 
     def __repr__(self):
         return str(self)
