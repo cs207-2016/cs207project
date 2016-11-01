@@ -29,12 +29,20 @@ import random
 
 
 '''
-Functions Being Tested:
+Functions Being Tested: Len
 Summary: Basic Len Test
 '''
 def test_len():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     assert len(ts) == 4
+
+'''
+Functions Being Tested: Repr
+Summary: Basic Repr Test
+'''
+def test_repr():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    assert repr(ts) == 'TimeSeries([[1\t100][2\t101][3\t102][4\t103]])'
 
 '''
 Functions Being Tested: Init
@@ -152,6 +160,16 @@ def test_add():
     assert ts2 == (ts+ts)
 
 '''
+Functions Being Tested: add
+Summary: add integer
+'''
+def test_add2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[105,106,107,108])
+    assert ts2 == (ts+5)
+
+
+'''
 Functions Being Tested: sub
 Summary: Basic sub test
 '''
@@ -162,6 +180,15 @@ def test_sub():
 
 '''
 Functions Being Tested: sub
+Summary: sub integer
+'''
+def test_sub2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[105,106,107,108])
+    assert ts == (ts2 - 5)
+
+'''
+Functions Being Tested: sub
 Summary: Basic sub test
 '''
 def test_mult():
@@ -169,6 +196,16 @@ def test_mult():
     ts2 = TimeSeries([1,2,3,4],[2,2,2,2])
     ts3 = TimeSeries([1,2,3,4],[200,202,204,206])
     assert ts3 == (ts*ts2)
+
+'''
+Functions Being Tested: mult
+Summary: mult integer
+'''
+def test_mult2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[500,505,510,515])
+    assert ts2 == (ts * 5)
+
 
 
 '''
@@ -263,6 +300,16 @@ Summary: Basic Get Item Test
 def test_getItem_ats():
     ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
     assert ats[3] == 103
+
+'''
+Functions Being Tested: getitem
+Summary: getItem Index Error
+'''
+def test_getItem_ats_IndexError():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ats[5]
+
 
 '''
 Functions Being Tested: setitem
