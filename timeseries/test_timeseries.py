@@ -532,6 +532,27 @@ def test_std_successive_chunk_sts():
     sts_std = sts.online_std(2)
     assert list(sts_std.produce(2)) == [(3, 0), (4, np.std([12, 13], ddof=1))]
     
+'''
+Functions being tested: online_mean
+Summary: produce should return 'chunk' values of the online_mean SimulatedTimeSeries 
+'''
+def test_std_chunk_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_mean = sts.online_mean(2)
+    assert list(sts_mean.produce(2)) == [(1, 10), (2, np.mean([10, 11]))]
+
+'''
+Functions being tested: online_std
+Summary: produce should return next 'chunk' values of the online_mean SimulatedTimeSeries 
+'''
+def test_std_successive_chunk_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_mean = sts.online_mean(2)
+    sts_mean_first = list(sts_mean.produce(2))
+    sts_mean = sts.online_mean(2)
+    assert list(sts_mean.produce(2)) == [(3, 12), (4, np.mean([12, 13]))]
 
 
     
