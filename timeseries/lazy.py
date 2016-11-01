@@ -21,9 +21,9 @@ def lazy(function):
 @lazy
 def lazy_add(a,b):
     '''Lazy addition. Stores arguments and function for later evaluation'''
-     return a+b
+    return a+b
 
 @lazy
 def lazy_mul(a,b):
     '''Lazy multiplication. Stores arguments and function for later evaluation'''
-     return a*b
+    return a*b
