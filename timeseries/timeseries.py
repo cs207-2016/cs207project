@@ -32,7 +32,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
                 iter(params[p])
             except:
                 raise TypeError('`%s` must be a sequence.' % p)
-       
+
         # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
             raise ValueError('`time_points` and `data_points` must have the same length.')
@@ -112,7 +112,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         '''A Decorator to check if the rhs is either a TimeSeries with the same
         time values or a real number. If neither, raises an appropriate error'''
         def _check_time_values_helper(self , rhs):
-            if isinstance(rhs, numbers.Real): 
+            if isinstance(rhs, numbers.Real):
                 return function(self, rhs)
             elif not isinstance(rhs, SizedContainerTimeSeriesInterface):
                 raise NotImplementedError
@@ -194,6 +194,9 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             return TimeSeries(list(self.itertimes()), [x * other for x in iter(self)])
         else:
             return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
+
+    def mean(self):
+        return sum(self.itertimes())/len(self)
 
     def iteritems(self):
         '''Returns an iterator over the TimeSeries times'''
@@ -282,7 +285,7 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
     yields data based on a generator '''
 
     @abc.abstractmethod
-    def produce(self)->list:
+    def produce(self)->tuple:
         '''Generate (time, value) tuples'''
 
     def online_std(self, chunk=1):
@@ -302,6 +305,19 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
                     yield stddev
             return SimulatedTimeSeries(gen)
 
+
+def online_mean(self, chunk=1):
+    def gen():
+        n = 0
+        mean = 0
+        for x in self.iteritems():
+            n += 1
+            mean = ((n - 1) * mean + x) / n
+            yield mean
+
+    return SimulatedTimeSeries(gen)
+
+
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
     '''Creates a Simulated TimeSeries with no internal storage
     that yields data from a supplied generator, either with or
@@ -317,15 +333,15 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         return self
 
     def __next__(self):
-        return self.produce()[1]
+        return next(self.produce())[1]
 
     def iteritems(self):
         '''Returns an iterator that gets a new (time,value) tuple from produce'''
-        yield self.produce()
+        yield next(self.produce())
 
     def itertimes(self):
         '''Returns an iterator that gets a new time from produce'''
-        yield self.produce()[0]
+        yield next(self.produce())[0]
 
     def __repr__(self):
         format_str = '{}([{}])'
@@ -346,6 +362,6 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
         for i in range(chunk):
             value = next(self._gen)
             if type(value) == tuple:
-                return value
+                yield value
             else:
-                return (int(datetime.datetime.now().timestamp()), value)
+                yield (int(datetime.datetime.now().timestamp()), value)
