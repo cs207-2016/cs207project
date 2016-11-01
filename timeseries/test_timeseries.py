@@ -419,7 +419,15 @@ def test_setItem_ats_IndexError():
         ats[5] = 105
 
 '''
-Functions Being Tested: interpolate and itertimes ATS
+Functions Being Tested: std
+Summary: standard deviation
+'''
+
+def test_std():
+    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
+    assert ts.std() == np.std([10, 11, 12, 13])
+
+'''Functions Being Tested: interpolate and itertimes ATS
 Summary: Interpolate and Itertimes Test
 '''
 def test_interpolate_itertimes_ats():
