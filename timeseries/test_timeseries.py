@@ -28,13 +28,22 @@ import numpy as np
 import random
 
 
+
 '''
-Functions Being Tested:
+Functions Being Tested: Len
 Summary: Basic Len Test
 '''
 def test_len():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     assert len(ts) == 4
+
+'''
+Functions Being Tested: Repr
+Summary: Basic Repr Test
+'''
+def test_repr():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    assert repr(ts) == 'TimeSeries([[1\t100][2\t101][3\t102][4\t103]])'
 
 '''
 Functions Being Tested: Init
@@ -43,6 +52,30 @@ Summary: Value error if Time and Data Length don't match
 def test_init_valueError():
     with raises(ValueError):
         ts = TimeSeries([1,2,3,4,5],[100,101,102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if time value is not a real number
+'''
+def test_init_valueError_time():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,"hello",4],[100,101,102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if data value is not a real number
+'''
+def test_init_valueError_data():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,3,4],[100,"hello",102,103])
+
+'''
+Functions Being Tested: Init
+Summary: Value error if time value is duplicated
+'''
+def test_init_valueError_dupTime():
+    with raises(ValueError):
+        ts = TimeSeries([1,2,2,4],[100,100,102,103])
 
 '''
 Functions Being Tested: Init
@@ -61,6 +94,33 @@ def test_getItem():
     assert ts[3] == 103
 
 '''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for String
+'''
+def test_getItem_TypeError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(TypeError):
+        ts["hello"]
+
+'''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for Float
+'''
+def test_getItem_TypeError3():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(TypeError):
+        ts[52.222]
+
+'''
+Functions Being Tested: getitem
+Summary: TypeError Get Item for Float
+'''
+def test_getItem_IndexError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ts[33]
+
+'''
 Functions Being Tested: setitem
 Summary: Basic Set Item test
 '''
@@ -68,6 +128,15 @@ def test_setItem():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     ts[2] = 5
     assert ts[2] == 5
+
+'''
+Functions Being Tested: setitem
+Summary: ValueError if setting a value that's not a real number
+'''
+def test_setItem_ValueError():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(ValueError):
+        ts[0] = "hello"
 
 '''
 Functions Being Tested: str
@@ -152,6 +221,16 @@ def test_add():
     assert ts2 == (ts+ts)
 
 '''
+Functions Being Tested: add
+Summary: add integer
+'''
+def test_add2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[105,106,107,108])
+    assert ts2 == (ts+5)
+
+
+'''
 Functions Being Tested: sub
 Summary: Basic sub test
 '''
@@ -159,6 +238,15 @@ def test_sub():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     ts2 = TimeSeries([1,2,3,4],[0,0,0,0])
     assert ts2 == (ts-ts)
+
+'''
+Functions Being Tested: sub
+Summary: sub integer
+'''
+def test_sub2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[105,106,107,108])
+    assert ts == (ts2 - 5)
 
 '''
 Functions Being Tested: sub
@@ -170,6 +258,14 @@ def test_mult():
     ts3 = TimeSeries([1,2,3,4],[200,202,204,206])
     assert ts3 == (ts*ts2)
 
+'''
+Functions Being Tested: mult
+Summary: mult integer
+'''
+def test_mult2():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    ts2 = TimeSeries([1,2,3,4],[500,505,510,515])
+    assert ts2 == (ts * 5)
 
 '''
 Functions Being Tested: abs
@@ -265,6 +361,16 @@ def test_getItem_ats():
     assert ats[3] == 103
 
 '''
+Functions Being Tested: getitem
+Summary: getItem Index Error
+'''
+def test_getItem_ats_IndexError():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ats[5]
+
+
+'''
 Functions Being Tested: setitem
 Summary: Basic Set Item test
 '''
@@ -272,5 +378,63 @@ def test_setItem_ats():
     ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
     ats[2] = 5
     assert ats[2] == 5
+
+'''
+Functions Being Tested: add
+Summary: add list NotImplemented
+'''
+def test_add_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts + myList
+
+'''
+Functions Being Tested: mult
+Summary: mult list NotImplemented
+'''
+def test_mult_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts*myList
+
+'''
+Functions Being Tested: sub
+Summary: sub list NotImplemented
+'''
+def test_sub_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts-myList
+
+'''       
+Functions Being Tested: setitem
+Summary: setItem Index Error
+'''
+def test_setItem_ats_IndexError():
+    ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
+    with raises(IndexError):
+        ats[5] = 105
+
+'''
+Functions Being Tested: interpolate and itertimes ATS
+Summary: Interpolate and Itertimes Test
+'''
+def test_interpolate_itertimes_ats():
+     
+    a = ArrayTimeSeries([0,5,10], [1,2,3])
+    b = ArrayTimeSeries([2.5,7.5], [100, -100])
+    assert a.interpolate(b.itertimes()) == ArrayTimeSeries([2.5,7.5], [1.5, 2.5])
+
+
+'''
+Functions Being Tested: interpolate ATS
+Summary: Interpolate Boundary Scenario
+'''
+def test_interpolate_boundary_ats():
+    a = ArrayTimeSeries([0,5,10], [1,2,3])
+    a.interpolate([-100,100]) == ArrayTimeSeries([-100,100],[1,3])
 
 
