@@ -311,15 +311,16 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
                     yield (time, stddev)
         return SimulatedTimeSeries(gen())
 
-    def online_mean(self, chunk=1):
+    def online_mean(self):
+    """ Returns the online mean (packed with associated time as a tuple) of a TimeSeries """
         def gen():
             n = 0
             mean = 0
-            for x in self.iteritems():
+            for t,x in self:
                 n += 1
                 mean = ((n - 1) * mean + x) / n
-                yield mean
-        return SimulatedTimeSeries(gen())
+                yield (t,mean)
+        return SimulatedTimeSeries(gen)
 
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
