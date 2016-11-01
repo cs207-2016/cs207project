@@ -15,7 +15,6 @@ class TimeSeriesInterface(abc.ABC):
     @abc.abstractmethod
     def iteritems(self):
         '''Iterate over (time, data)'''
-
     @abc.abstractmethod
     def itertimes(self):
         '''Iterate over times'''
@@ -113,15 +112,13 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         '''A Decorator to check if the rhs is either a TimeSeries with the same
         time values or a real number. If neither, raises an appropriate error'''
         def _check_time_values_helper(self , rhs):
-            print(rhs)
-            try:
-                if isinstance(rhs, numbers.Real):
-                    return function(self, rhs)
-                elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
-                    raise ValueError('Both time series must have the same time points.')
+            if isinstance(rhs, numbers.Real): 
                 return function(self, rhs)
-            except AttributeError:
-                raise NotImplemented
+            elif not isinstance(rhs, SizedContainerTimeSeriesInterface):
+                raise NotImplementedError
+            elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
+                raise ValueError('Both time series must have the same time points.')
+            return function(self, rhs)
         return _check_time_values_helper
 
     def __neg__(self):
@@ -276,6 +273,22 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
     @abc.abstractmethod
     def produce(self)->list:
         '''Generate (time, value) tuples'''
+
+    def online_std(self, chunk=1):
+        "Online standard deviation"
+        #A simulated timeseries that gives std
+        n = 0
+        mu = 0
+        dev_accum = 0
+        for i in range(chunk):
+            value = next(self._gen)
+            n += 1
+            delta = value - mu
+            dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
+            mu = mu + delta/n
+            if n > 1:
+                stddev = math.sqrt(dev_accum/(n-1))
+                yield stddev
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
     '''Creates a Simulated TimeSeries with no internal storage
