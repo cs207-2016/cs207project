@@ -310,16 +310,15 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
                     yield (time, stddev)
         return SimulatedTimeSeries(gen())
 
-def online_mean(self, chunk=1):
-    def gen():
-        n = 0
-        mean = 0
-        for x in self.iteritems():
-            n += 1
-            mean = ((n - 1) * mean + x) / n
-            yield mean
-
-    return SimulatedTimeSeries(gen())
+    def online_mean(self, chunk=1):
+        def gen():
+            n = 0
+            mean = 0
+            for x in self.iteritems():
+                n += 1
+                mean = ((n - 1) * mean + x) / n
+                yield mean
+        return SimulatedTimeSeries(gen())
 
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
