@@ -15,7 +15,6 @@ class TimeSeriesInterface(abc.ABC):
     @abc.abstractmethod
     def iteritems(self):
         '''Iterate over (time, data)'''
-
     @abc.abstractmethod
     def itertimes(self):
         '''Iterate over times'''
@@ -76,15 +75,13 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
     def _check_time_values(function):
         def _check_time_values_helper(self , rhs):
-            print(rhs)
-            try:
-                if isinstance(rhs, numbers.Real): 
-                    return function(self, rhs)
-                elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
-                    raise ValueError('Both time series must have the same time points.')
+            if isinstance(rhs, numbers.Real): 
                 return function(self, rhs)
-            except AttributeError:
-                raise NotImplemented
+            elif not isinstance(rhs, TimeSeries):
+                raise NotImplementedError
+            elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
+                raise ValueError('Both time series must have the same time points.')
+            return function(self, rhs)
         return _check_time_values_helper
 
     def __neg__(self):

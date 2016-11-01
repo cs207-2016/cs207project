@@ -273,4 +273,34 @@ def test_setItem_ats():
     ats[2] = 5
     assert ats[2] == 5
 
+'''
+Functions Being Tested: add
+Summary: add list NotImplemented
+'''
+def test_add_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts + myList
+
+'''
+Functions Being Tested: mult
+Summary: mult list NotImplemented
+'''
+def test_mult_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts*myList
+
+'''
+Functions Being Tested: sub
+Summary: sub list NotImplemented
+'''
+def test_sub_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts-myList
+
 
