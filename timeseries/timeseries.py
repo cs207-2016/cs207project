@@ -58,17 +58,14 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         return self._data[key]
 
     def __setitem__(self, key, value):
-<<<<<<< Updated upstream
         '''Sets the data point from the TimeSeries with index = key to value'''
 
         self._data[key] = value
-=======
         # Raise exception if a value is not a real number
         if not isinstance(value, numbers.Real):
             raise ValueError('`value` must be a real number')
         else:
             self._data[key] = value
->>>>>>> Stashed changes
 
     def __repr__(self):
         return str(self)
