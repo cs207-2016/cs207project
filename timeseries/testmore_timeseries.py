@@ -27,9 +27,36 @@ from timeseries import *
 import numpy as np
 import random
 
-
-
-
-
 ##### ArrayTimeSeries Tests ####
+
+'''
+Functions Being Tested: mult
+Summary: mult integer TypeError 
+'''
+def test_mult3():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    myList = [1,2,3,4]
+    with raises(TypeError):
+        ts * myList
+
+
+'''
+Functions Being Tested: sub
+Summary: sub integer TypeError 
+'''
+def test_sub3():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    myList = [1,2,3,4]
+    with raises(TypeError):
+        ts - myList
+
+'''
+Functions Being Tested: add
+Summary: add integer TypeError 
+'''
+def test_add3():
+    ts = TimeSeries([1,2,3,4],[100,101,102,103])
+    myList = [1,2,3,4]
+    with raises(TypeError):
+        ts + myList
 
