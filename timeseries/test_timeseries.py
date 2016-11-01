@@ -26,6 +26,8 @@ from pytest import raises
 from timeseries import *
 import numpy as np
 import random
+import math
+import datetime
 
 
 
@@ -164,7 +166,6 @@ def test_interpolate_itertimes():
     b = TimeSeries([2.5,7.5], [100, -100])
     assert a.interpolate(b.itertimes()) == TimeSeries([2.5,7.5], [1.5, 2.5])
 
-
 '''
 Functions Being Tested: interpolate
 Summary: Interpolate Boundary Scenario
@@ -199,7 +200,6 @@ def test_neg():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
     ts2 = TimeSeries([1,2,3,4],[-100,-101,-102,-103])
     assert -ts == ts2
-
 
 '''
 Functions Being Tested: pos
@@ -324,6 +324,44 @@ def test_mult_valueError():
     with raises(ValueError):
         ts * ts2
 
+'''
+Functions Being Tested: add
+Summary: add list NotImplemented
+'''
+def test_add_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts + myList
+
+'''
+Functions Being Tested: mult
+Summary: mult list NotImplemented
+'''
+def test_mult_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts*myList
+
+'''
+Functions Being Tested: sub
+Summary: sub list NotImplemented
+'''
+def test_sub_notImplemented():
+   ts = TimeSeries([1,2,3,4],[100,101,102,103])
+   myList = [1,2,3,4]
+   with raises(NotImplementedError):
+       ts-myList
+
+'''
+Functions Being Tested: std
+Summary: standard deviation
+'''
+
+def test_std():
+    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
+    assert ts.std() == np.std([10, 11, 12, 13])
 
 ### Start of ArrayTimeSeries Tests###
 
@@ -379,36 +417,6 @@ def test_setItem_ats():
     ats[2] = 5
     assert ats[2] == 5
 
-'''
-Functions Being Tested: add
-Summary: add list NotImplemented
-'''
-def test_add_notImplemented():
-   ts = TimeSeries([1,2,3,4],[100,101,102,103])
-   myList = [1,2,3,4]
-   with raises(NotImplementedError):
-       ts + myList
-
-'''
-Functions Being Tested: mult
-Summary: mult list NotImplemented
-'''
-def test_mult_notImplemented():
-   ts = TimeSeries([1,2,3,4],[100,101,102,103])
-   myList = [1,2,3,4]
-   with raises(NotImplementedError):
-       ts*myList
-
-'''
-Functions Being Tested: sub
-Summary: sub list NotImplemented
-'''
-def test_sub_notImplemented():
-   ts = TimeSeries([1,2,3,4],[100,101,102,103])
-   myList = [1,2,3,4]
-   with raises(NotImplementedError):
-       ts-myList
-
 '''       
 Functions Being Tested: setitem
 Summary: setItem Index Error
@@ -417,15 +425,6 @@ def test_setItem_ats_IndexError():
     ats = ArrayTimeSeries([1,2,3,4],[100,101,102,103])
     with raises(IndexError):
         ats[5] = 105
-
-'''
-Functions Being Tested: std
-Summary: standard deviation
-'''
-
-def test_std():
-    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
-    assert ts.std() == np.std([10, 11, 12, 13])
 
 '''Functions Being Tested: interpolate and itertimes ATS
 Summary: Interpolate and Itertimes Test
@@ -444,5 +443,78 @@ Summary: Interpolate Boundary Scenario
 def test_interpolate_boundary_ats():
     a = ArrayTimeSeries([0,5,10], [1,2,3])
     a.interpolate([-100,100]) == ArrayTimeSeries([-100,100],[1,3])
+
+
+#Simulated timeseries tests begin
+'''
+Functions being tested: next
+Summary: Returns the next value in the Simulated timeseries
+'''
+def test_next_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert next(sts) == 10
+
+'''
+Functions being tested: iteritems
+Summary: Returns an iterator to the next value in the Simulated timeseries
+'''
+def test_iteritems_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.iteritems()) == [(1,10)]
+
+'''
+Functions being tested: iteritems
+Summary: Returns an iterator to the next value in the Simulated timeseries
+'''
+def test_itertimes_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.itertimes()) == [1]
+    
+'''
+Functions being tested: produce
+Summary: produce should return next value of the SimulatedTimeSeries if the input is a tuple
+'''
+def test_produce_sts():
+    sts_gen = zip(range(5), range(5))
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.produce()) == [(0,0)]
+
+'''
+Functions being tested: produce
+Summary: produce should return next value of the SimulatedTimeSeries with a timestamp if the input is a single value
+'''
+def test_produce_timestamp_sts():
+    sts_gen = iter(range(5))
+    sts = SimulatedTimeSeries(sts_gen)
+    assert list(sts.produce()) == [(int(datetime.datetime.now().timestamp()), 0)]
+
+'''
+Functions being tested: produce
+Summary: produce should return 'chunk' values of the SimulatedTimeSeries
+'''
+def test_produce_chunk_sts():
+    sts_gen = zip(range(5), range(5))
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_produced = sts.produce(3)
+    assert list(sts_produced) == [(0,0), (1, 1), (2, 2)]
+
+'''
+Functions being tested: online_std
+Summary: produce should return 'chunk' values of the SimulatedTimeSeries
+'''
+def test_std_chunk_sts():
+    sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
+    sts = SimulatedTimeSeries(sts_gen)
+    sts_std = sts.online_std(2)
+    assert list(sts_std.produce(2)) == [(1, 0), (2, np.std([10, 11], ddof=1))]
+
+
+
+
+
+    
 
 
