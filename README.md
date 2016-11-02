@@ -8,7 +8,7 @@ A time series is an ordered series of data point indexed by or associated with t
 
 The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points. The following diagram show the class hierarchy:
 
-![Class Hierarchy](https://github.com/cs207project/images/class_hierarchy.png "Class Hierarchy1")
+![Class Hierarchy](images/class_hierarchy.png "Class Hierarchy")
 
 ## Examples
 
