@@ -8,19 +8,19 @@ A time series is an ordered series of data point indexed by or associated with t
 
 The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points. The following diagram show the class hierarchy:
 
-![alt text](https://github.com/cs207project/images/class_hierarchy.png "Class Hierarchy1")
+![Class Hierarchy](https://github.com/cs207project/images/class_hierarchy.png "Class Hierarchy1")
 
-# Examples
+## Examples
 
 ```python
-	$ from timeseries import *
+	from timeseries import *
 
-	$ time_pts = range(10)
-	$ data_pts = [np.random.rand()*100 for _ in range(10)]
-	$ data_pts2 = [np.random.rand()*100 for _ in range(10)]
+	time_pts = range(10)
+	data_pts = [np.random.rand()*100 for _ in range(10)]
+	data_pts2 = [np.random.rand()*100 for _ in range(10)]
 
-	$ ts1 = TimeSeries(time_pts, data_pts)
-	$ ts2 = TimeSeries(time_pts, data_pts2)
+	ts1 = TimeSeries(time_pts, data_pts)
+	ts2 = TimeSeries(time_pts, data_pts2)
 	
 	print(ts1)
 	>>> TimeSeries([[0,74.03971533376968]
