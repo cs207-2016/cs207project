@@ -414,13 +414,17 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
         return SimulatedTimeSeries(gen())
 
     def online_mean(self, chunk=1):
+        "Online mean"
         def gen():
             n = 0
-            mean = 0
-            for x in self.iteritems():
+            mu = 0
+            for i in range(chunk):
+                tmp = next(self._gen)
+                (time, value) = (tmp[0], tmp[1])
                 n += 1
-                mean = ((n - 1) * mean + x) / n
-                yield mean
+                delta = value - mu
+                mu = mu + delta/n
+                yield (time, mu)
         return SimulatedTimeSeries(gen())
 
 
