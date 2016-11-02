@@ -45,7 +45,7 @@ Summary: Basic Repr Test
 '''
 def test_repr():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
-    assert repr(ts) == 'TimeSeries([[1\t100][2\t101][3\t102][4\t103]])'
+    assert repr(ts) == '<timeseries.TimeSeries object at %s>TimeSeries([[1,100]\n[2,101]\n[3,102]\n[4,103]\n])' % hex(id(ts))
 
 '''
 Functions Being Tested: Init
@@ -435,6 +435,16 @@ def test_setItem_ats_IndexError():
     with raises(IndexError):
         ats[5] = 105
 
+
+'''
+Functions Being Tested: std
+Summary: standard deviation
+'''
+
+def test_std():
+    ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
+    assert ts.std() == np.std([10, 11, 12, 13], ddof=1)
+
 '''Functions Being Tested: interpolate and itertimes ATS
 Summary: Interpolate and Itertimes Test
 '''
@@ -471,7 +481,7 @@ Summary: Returns an iterator to the next value in the Simulated timeseries
 def test_iteritems_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
     sts = SimulatedTimeSeries(sts_gen)
-    assert list(sts.iteritems()) == [(1,10)]
+    assert list(sts.iteritems()) == list(zip([1, 2, 3, 4], [10, 11, 12, 13]))
 
 '''
 Functions being tested: itertimes
@@ -480,7 +490,7 @@ Summary: Returns an iterator to the next time value in the Simulated timeseries
 def test_itertimes_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
     sts = SimulatedTimeSeries(sts_gen)
-    assert list(sts.itertimes()) == [1]
+    assert list(sts.itertimes()) == [1, 2, 3, 4]
     
 '''
 Functions being tested: produce

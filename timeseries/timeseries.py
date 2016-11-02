@@ -8,6 +8,7 @@ import abc
 import datetime
 
 class TimeSeriesInterface(abc.ABC):
+    '''A series of data points associated with time points.'''
 
     @abc.abstractmethod
     def __iter__(self):
@@ -21,22 +22,31 @@ class TimeSeriesInterface(abc.ABC):
         '''Iterate over times'''
 
 class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
+    '''A TimeSeriesInterface that stores time and data points internally.
+
+    The interface preserves information but not type: ints may be converted to floats.'''
 
     def __init__(self, time_points, data_points):
-        '''Raises an exception if either parameter is not a sequence
-        or if `time_points` and `data_points` are not the same length'''
+        '''Constructor for SizedContainerTimeSeriesInterface.
 
+        Args:
+            `time_points` (`sequence` of `numbers.Real`): 
+                A nondecreasing sequence of time points. Must have same length as `data_points`.
+            `data_points` (`sequence` of `numbers.Real`): 
+                A sequence of data points. Must have same length as `time_points`.'''
+
+        # Raise an exception if any parameter is not a sequence.
         params = {'time_points': time_points,
                   'data_points': data_points}
         for p in params:
             try:
                 iter(params[p])
             except:
-                raise TypeError('`%s` must be a sequence.' % p)
+                raise TypeError('Parameter `%s` must be a sequence type.' % p)
 
         # Raise an exception if `time_points` and `data_points` are not the same length
         if len(list(time_points)) != len(list(data_points)):
-            raise ValueError('`time_points` and `data_points` must have the same length.')
+            raise ValueError('Parameters `time_points` and `data_points` must have the same length.')
 
         # Raise Exception if a time value is not a real number
         for time in iter(time_points):
@@ -54,7 +64,13 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
 
     def __getitem__(self, key):
-        '''Returns the data point from the TimeSeries with index = key'''
+        '''Returns the data point from the time series with index = key.
+         
+        Args:
+            `key`(int): The index of the desired data point.
+        Returns: 
+            numbers.Real: The value stored at the index `key`.'''
+        
         return self._data[key]
 
     def __setitem__(self, key, value):
@@ -67,17 +83,29 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             self._data[key] = value
 
     def __repr__(self):
-        return str(self)
+        '''Returns a string containing all information about the instance relevant to a technical user.
+
+        Returns:
+            str: The representation of the object.'''
+
+        fmt_str = '<{}.{} object at {}>{}'
+        return fmt_str.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            hex(id(self)),
+            str(self))
 
     def __str__(self):
-        '''Prints a more user-friendly interpretation of the SizedContainerTimeSeriesInterface'''
+        '''Returns a succint interpretation of the SizedContainerTimeSeriesInterface.
+
+        Returns:
+            str: An informal description of the object.'''
 
         format_str = '{}([{}])'
-        row_str = '[{}\t{}]'
+        row_str = '[{},{}]'
         add_str = ''
-
         for pts in self.iteritems():
-            add_str += row_str.format(pts[0], pts[1])
+            add_str += row_str.format(pts[0], pts[1]) + '\n'
         class_name = type(self).__name__
         return format_str.format(class_name, add_str)
 
@@ -85,34 +113,61 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         '''Generates new interpolated values for a TimeSeries given unseen times.
         Uses stationary boundary conditions: if a new time point is smaller than the
         first existing time point, returns the first value; likewise for larger time points.
+
         Args:
             pts: a list of time values to create interpolated points for
 
         Returns:
-            A new TimeSeries with the provided times and their interpolated values.'''
+            A new SizedContainerTimeSeriesInterface (of the same type) with the provided times and their interpolated values.'''
+
         inter_pts = []
         ts = list(pts)
-        for pt in ts:
+        for t in ts:
             # Get the two time points bounding `pts`
-            times = sorted(enumerate(self._times), key = lambda x: abs(x[1] - pt))[:2]
-            vals = [self._data[times[0][0]], self._data[times[1][0]]]
-            x = vals[0] + (pt - times[0][1]) * (vals[1] - vals[0]) / (times[1][1] - times[0][1])
-            inter_pts.append(x)
-        return TimeSeries(ts, inter_pts)
+            times = sorted(enumerate(self.itertimes()), key = lambda x: abs(x[1] - t))[:2]
+            i1, t1 = times[0]
+            i2, t2 = times[1]
+            if t <= t1: 
+                inter_pts.append(self._data[i1])
+            elif t >= t2:
+                inter_pts.append(self._data[i2])
+            else:
+                dt = t2 - t1
+                dy = self._data[i2] - self._data[i1]
+                m = dy / dt
+                y = m * (t - t1) + self._data[i1]
+                inter_pts.append(y)
+        return type(self)(ts, inter_pts)
 
     def __abs__(self):
-        '''Returns the two-norm of the value vector of the TimeSeries'''
+        '''Calculates the two-norm of the value vector of the time series.
+
+        Returns:
+            float: The two-norm of the value vector of the time series.'''
+
         return math.sqrt(sum(x**2 for x in self))
 
     def __bool__(self):
-        '''Checks if the value vector is of length zero. If so, returns false.
-        Otherwise returns true.'''
+        '''Determines whether the value vector is of length zero.
+    
+        Returns:
+            bool: True if abs(self) != 0, False otherwise.'''
+
         return bool(abs(self))
 
     def _check_time_values(function):
-        '''A Decorator to check if the rhs is either a TimeSeries with the same
-        time values or a real number. If neither, raises an appropriate error'''
+        '''Verifies that the RHS of an instance function is either a numbers.Real or
+           a SizedContainerTimeSeriesInterface with identical time values.
+
+           Returns:
+                function: The function verifying that the RHS is compatible.
+
+           Raises:
+                ValueError: The RHS is a time series whose time points are not equivalent.
+                NotImplementedError: The RHS is a noncompatible type.'''
+
         def _check_time_values_helper(self , rhs):
+            # An internal method for verifying that the other argument in an binary function is valid.
             if isinstance(rhs, numbers.Real):
                 return function(self, rhs)
             elif not isinstance(rhs, SizedContainerTimeSeriesInterface):
@@ -123,25 +178,33 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         return _check_time_values_helper
 
     def __neg__(self):
-        # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), [-x for x in iter(self)])
+        '''Returns a new time series of the same class with the negation of each data point.
+          
+           Returns:
+               SizedContainerTimeSeriesInterface: A new instance whose data points are the negation of `self`'s.'''
+
+        return type(self)(list(self.itertimes()), [-x for x in iter(self)])
 
     def __pos__(self):
-        # TODO: Create instance of calling class instead of TimeSeries
-        return TimeSeries(list(self.itertimes()), list(iter(self)))
+        '''Returns a new time series with identical data points.
+           
+           Returns:
+               SizedContainerTimeSeriesInterface: A copy of the instance.'''
+        return type(self)(list(self.itertimes()), list(iter(self)))
 
     @_check_time_values
     def __eq__(self, other):
-        '''Determines if two TimeSeries are equal or if all values of a TimeSeries are
-        equal to a real number.
+        '''Verifies that either the RHS is an equal SizedContainerTimeSeriesInterface
+           or all data points are equal to a real number.
+
         Args:
-            other: either a real number or another TimeSeries. If using another TimeSeries,
-            it must have the same time values
+            `other` (numbers.Real or SizedContainerTimeSeriesInterface): 
+                Either a real number or another SizedContainerTimeSeriesInterface. 
+                If using another TimeSeries, it must have the same time and data values.
 
         Returns:
-            True if all (time,value) tuples of the two TimeSeries are the same, or if all
-            values of the TimeSeries are equal to the real number.
-            False otherwise.'''
+            bool: True if all (time,value) tuples of the two TimeSeries are the same, or if all
+            values of the TimeSeries are equal to the real number. False otherwise.'''
 
         if isinstance(other, numbers.Real):
             return (all(x == numbers.Real for x in iter(self)))
@@ -150,91 +213,125 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
     @_check_time_values
     def __add__(self, other):
-        '''Adds either a real number or another TimeSeries to the TimeSeries.
+        '''Adds either a real number to each data point or elementwise addition with another time series.
+
         Args:
-            other: either a real number or another TimeSeries. If using another TimeSeries,
-            it must have the same time values
+            `other` (numbers.Real or SizedContainerTimeSeriesInterface): 
+                Either a real number or another TimeSeries. 
+                If using another TimeSeries, it must have the same time values.
 
         Returns:
-            A new TimeSeries with the same times and either an elementwise addition
-            with the real number or elementwise addition with the values of the other TimeSeries'''
+            SizedContainerTimeSeriesInterface: 
+                A new time series with the same times and either an elementwise addition
+                with the real number or elementwise addition between the values of the other time series.'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x + other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x + other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x + y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __sub__(self, other):
-        '''Subtracts either a real number or another TimeSeries from the TimeSeries.
+        '''Subtracts either a real number from each data point or elementwise subtraction with another time series.
+
         Args:
-            other: either a real number or another TimeSeries. If using another TimeSeries,
-            it must have the same time values
+            `other` (numbers.Real or SizedContainerTimeSeriesInterface): 
+                Either a real number or another time series. 
+                If using another time series, it must have the same time values.
 
         Returns:
-            A new TimeSeries with the same times and either an elementwise subtraction
-            of the real number or elementwise subtraction of the values of the other TimeSeries'''
+            SizedContainerTimeSeriesInterface subclass: 
+                A new time series with the same times and either an elementwise addition
+                with the real number or elementwise addition between the values of the other time series.'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x - other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x - other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x - y for x, y in zip(iter(self), iter(other))])
 
     @_check_time_values
     def __mul__(self, other):
-        '''Multiplies either a real number or another TimeSeries by the TimeSeries.
+        '''Either multiplies another time series elementwise, or multiples each data point value by a real number.
+
         Args:
-            other: either a real number or another TimeSeries. If using another TimeSeries,
-            it must have the same time values
+            `other` (numbers.Real or SizedContainerTimeSeriesInterface): 
+                Either a real number or another time series. 
+                If using another time series, it must have the same time values.
 
         Returns:
-            A new TimeSeries with the same times and either an elementwise multiplication
-            by the real number or elementwise multiplication by the values of the other TimeSeries'''
+            SizedContainerTimeSeriesInterface subclass: 
+                A new time series with the same times and either an elementwise multiplication
+                with the real number or elementwise multiplication between the values of the other time series.'''
 
         if isinstance(other, numbers.Real):
-            return TimeSeries(list(self.itertimes()), [x * other for x in iter(self)])
+            return type(self)(list(self.itertimes()), [x * other for x in iter(self)])
         else:
-            return TimeSeries(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
+            return type(self)(list(self.itertimes()), [x * y for x, y in zip(iter(self), iter(other))])
 
     def mean(self):
-        """Returns the mean of the input TimeSeries"""
+        '''Returns the mean of all data points in the time series.
+
+        Returns:
+            float: the mean of all data points in the time series.'''
+
         return np.mean(list(iter(self)))
 
     def iteritems(self):
-        '''Returns an iterator over the TimeSeries times'''
+        '''Returns an iterator over tuples of the time series' time and data points.
+
+        Returns:
+            iterable: an iterator over tuples (time, data) of the time series.'''
+
         return iter(zip(self.itertimes(), iter(self)))
 
     @property
     def lazy(self):
-        '''Returns a new LazyOperation instance using an identity function
-        and self as the only argument. This wraps up the TimeSeries instance
-        and a function which does nothing and saves them both for later.'''
+        '''Returns a new instance of LazyOperation.
+
+        Returns:
+            LazyOperation: a wrapper around a function not evaluated until called.'''
+
         return LazyOperation(lambda x: x, self)
 
     def std(self):
-        '''Returns the standard deviation of the TimeSeries
+        '''Computes the standard deviation of the time series.
 
         Returns:
-            The standard deviation as a float'''
+            float: The standard deviation of the time series.'''
+
         s = 0
-        mean = np.mean(list(iter(self)))
+        mean = self.mean()
         for i in iter(self):
             s += (mean - i)**2
-        return math.sqrt(s / len(self))
+        return math.sqrt(s / (len(self) - 1))
 
 class TimeSeries(SizedContainerTimeSeriesInterface):
     def __init__(self, time_points, data_points):
-        '''Inits a TimeSeries with time_points and data_points.
-        Stores these as lists.'''
+        '''Implements the SizedContainerTimeSeriesInterface using Python lists for storage.
+            
+            Args:
+                `time_points` (sequence): A sequence of time points. Must have length equal to `data_points.`
+                `data_points` (sequence): A sequence of data points. Must have length equal to `time_points.`
+            
+            Returns:
+                TimeSeries: A time series containing time and data points.'''
+
         super().__init__(time_points, data_points)
         self._times = list(time_points)
         self._data = list(data_points)
 
     def __len__(self):
+        '''The length of the time series.
+        Returns:
+           int: The number of elements in the time series.'''
+
         return len(self._times)
 
     def __iter__(self):
-        '''Returns an iterator over the TimeSeries values'''
+        '''An iterable over the data points of the time series.
+        Returns:
+            iterable: An iterable over the data points of the time series.'''
+
         return iter(self._data)
 
     def itertimes(self):
@@ -244,9 +341,14 @@ class TimeSeries(SizedContainerTimeSeriesInterface):
 class ArrayTimeSeries(TimeSeries):
 
     def __init__(self, time_points, data_points):
-        '''Inits a TimeSeries with time_points and data_points.
-        Stores these as numpy arrays with extra space in the length of
-        the provided arrays.'''
+        '''Implements the SizedContainerTimeSeriesInterface using NumPy arrays for storage.
+            
+            Args:
+                `time_points` (sequence): A sequence of time points. Must have length equal to `data_points.`
+                `data_points` (sequence): A sequence of data points. Must have length equal to `time_points.`
+            
+            Returns:
+                ArrayTimeSeries: A time series containing time and data points.'''
 
         super().__init__(time_points, data_points)
 
@@ -327,49 +429,57 @@ class StreamTimeSeriesInterface(TimeSeriesInterface):
 
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
-    '''Creates a Simulated TimeSeries with no internal storage
-    that yields data from a supplied generator, either with or
-    without times provided'''
+    '''A time series with no internal storage. 
+    Yields data from a supplied generator, either with or without times provided.'''
 
 
     def __init__(self, generator):
         '''Inits SimulatedTimeSeries with a value or (time,value) generator'''
-        self._gen = generator
+        try:
+            self._gen = iter(generator)
+            self._index = 0
+        except:
+            raise TypeError('Parameter `generator` must be a sequence type.')
+
 
     def __iter__(self):
         '''Returns an iterator that gets a new value from produce'''
         return self
 
     def __next__(self):
-        return next(self.produce())[1]
+        '''An iterator that gets a new data point from produce'''
+        return self.produce()[0][1]
 
     def iteritems(self):
-        '''Returns an iterator that gets a new (time,value) tuple from produce'''
-        yield next(self.produce())
+        '''An iterator that gets a new (time,value) tuple from produce'''
+        while True:
+            yield self.produce()[0]
 
     def itertimes(self):
-        '''Returns an iterator that gets a new time from produce'''
-        yield next(self.produce())[0]
+        '''An iterator that gets a new time from produce'''
+        while True:
+            yield self.produce()[0][0]
 
     def __repr__(self):
         format_str = '{}([{}])'
-
         class_name = type(self).__name__
         return format_str.format(class_name, str(self._gen))
 
-    def produce(self, chunk=1):
-        '''Generates up to chunk (time, value) tuples. If optional time is not
-        provided, adds an integer timestamp to value
+    def produce(self, chunk = 1):
+        '''Generates a list of up to chunk (time, value) tuples. If optional time is not
+        provided, adds an integer timestamp (Unix time) to value
 
         Args:
-            chunk: the number of tuples produce generates
+            chunk (int): the number of tuples produce generates
 
         Returns:
-            chunk # of (time, value) tuples'''
+            list: list of (time, value) tuples.'''
 
+        values = []
         for i in range(chunk):
             value = next(self._gen)
             if type(value) == tuple:
-                yield value
+                values.append(value)
             else:
-                yield (int(datetime.datetime.now().timestamp()), value)
+                values.append((int(datetime.datetime.now().timestamp()), value))
+        return values
