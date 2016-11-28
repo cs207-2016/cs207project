@@ -81,7 +81,7 @@ def test_gt():
     db.close()
 
 '''
-Tree Properties Being Tested: Left Child > Parent
+Tree Properties Being Tested: Left Child < Parent
 Summary: Testing Tree LT Property
 '''
 def test_lt():
