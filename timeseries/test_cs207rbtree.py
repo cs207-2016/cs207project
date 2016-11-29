@@ -37,7 +37,10 @@ Functions Being Tested: Get
 Summary: Basic Get Test
 '''
 def test_get():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     for i in range(97,108):
         db.set(i,chr(i))
@@ -50,7 +53,10 @@ Functions Being Tested: Commit
 Summary: Basic Commit Test
 '''
 def test_commit():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     for i in range(97,108):
         db.set(i,chr(i))
@@ -104,7 +110,10 @@ Tree Properties Being Tested: Okasaki Case 1 Rotation
 Summary: Testing Okasaki Rebalance 1
 '''
 def test_ok1():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     db.set(3,'c')
     db.set(1,'a')
@@ -125,7 +134,10 @@ Tree Properties Being Tested: Okasaki Case 2 Rotation
 Summary: Testing Okasaki Rebalance 2
 '''
 def test_ok2():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     db.set(3,'c')
     db.set(2,'b')
@@ -146,7 +158,10 @@ Tree Properties Being Tested: Okasaki Case 3 Rotation
 Summary: Testing Okasaki Rebalance 3
 '''
 def test_ok3():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     db.set(1,'a')
     db.set(2,'b')
@@ -167,7 +182,10 @@ Tree Properties Being Tested: Okasaki Case 4 Rotation
 Summary: Testing Okasaki Rebalance 4
 '''
 def test_ok4():
-    os.remove("/tmp/test2.dbdb")
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
     db = connect("/tmp/test2.dbdb")
     db.set(1,'a')
     db.set(3,'c')
