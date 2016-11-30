@@ -60,10 +60,14 @@ def generate_ts(num_of_ts = 50):
 
         file_name = "tsfiles/"+key+".dat"
         #print (file_name)
-        #try:
-        f = open(file_name, 'w')
-        #Exception:
-        #    raise 
+        try:
+            f = open(file_name, 'w')
+        except IOError, (errno, strerror):
+            print "I/O error(%s): %s" % (errno, strerror)
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
+        #    raise
 
         for j in range(len(time)):
             f.write(str(time[j]))
