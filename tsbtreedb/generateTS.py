@@ -7,9 +7,19 @@ sys.path.append('/'.join(ts_dir))
 
 from timeseries.timeseries import TimeSeries
 import numpy as np
-from tsbtreedb.correlation import tsmaker, stand, kernel_corr
+from tsbtreedb.correlation import correlation
 import os
 import shutil
+
+'''
+This file includes a function called generateTS to generate some time series
+
+How to run:
+first import this file
+then call 'generateTS(num_of_ts)' to generate num_of_ts(an integer) time series
+
+All time series files will be saved in a folder called 'tsfiles'
+'''
 
 def generate_ts(num_of_ts = 50):
     '''
@@ -18,8 +28,7 @@ def generate_ts(num_of_ts = 50):
     The standard deviation of each time series values is a number uniformly chosen
     form 0.05 and 0.4. The jitter of each time series is a number unifromly chosen
     from 0.05 and 0.2.
-    Run 'python generate_ts.py 1000' to generate 1000 time series in the directory
-    '/tsfile', with each time series stored in a dat file.
+
     Param:
       num_ts: int, the number of time series that shoule be generated
     Return:
@@ -40,7 +49,7 @@ def generate_ts(num_of_ts = 50):
 
     # fill dictionaries with randomly generated entries for database
     for i, m, s, j in zip(range(num_ts), mus, sigs, jits):
-        tsrs = tsmaker(m, s, j)  # generate data
+        tsrs = correlation.tsmaker(m, s, j)  # generate data
         pk = "ts_{}".format(i)  # generate primary key
         #print (pk)
         primary_keys.append(pk) # keep track of all primary keys
@@ -62,12 +71,11 @@ def generate_ts(num_of_ts = 50):
         #print (file_name)
         try:
             f = open(file_name, 'w')
-        except IOError, (errno, strerror):
-            print "I/O error(%s): %s" % (errno, strerror)
+        except IOError:
+            print('cannot open', file_name)
         except:
-            print "Unexpected error:", sys.exc_info()[0]
+            print("Unexpected error:", sys.exc_info()[0])
             raise
-        #    raise
 
         for j in range(len(time)):
             f.write(str(time[j]))
@@ -80,7 +88,7 @@ def generate_ts(num_of_ts = 50):
     return ts_dict
 
 
-if __name__ == "__main__":
-    num_ts = sys.argv[1]
+#if __name__ == "__main__":
+#    num_ts = sys.argv[1]
     #print(num_ts)
-    ts_dict = generate_ts(num_ts)
+#    ts_dict = generate_ts(num_ts)
