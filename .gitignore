@@ -4,3 +4,5 @@
 *.cache
 timeseries/#timeseries.py#
 timeseries/.#timeseries.py                               
+tests/tsdb
+tests/tsfiles
