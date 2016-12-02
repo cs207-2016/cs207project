@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
-[![Coverage Status](https://coveralls.io/repos/github/cs207-2016/cs207project/badge.svg?branch=master)](https://coveralls.io/github/cs207-2016/cs207project?branch=master)
-
 A library for working with time series.
 
 A time series is an ordered series of data point indexed by or associated with time points. See [Wikipedia](https://en.wikipedia.org/wiki/Time_series) for more information.
