@@ -1,8 +1,8 @@
 import os, sys
 curr_dir = os.getcwd().split('/')
 print(curr_dir)
-sys.path.append('/'.join(curr_dir[:-1]))
-ts_dir = curr_dir[:-1]
+sys.path.append('/'.join(curr_dir))
+ts_dir = curr_dir
 ts_dir.append('timeseries')
 sys.path.append('/'.join(ts_dir))
 
