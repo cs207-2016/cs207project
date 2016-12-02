@@ -200,3 +200,39 @@ def test_ok4():
     assert left_node.color == Color.BLACK
     assert right_node.color == Color.BLACK
     db.close()
+
+'''
+Functions Being Tested: Get
+Summary: Get KeyError Test
+'''
+def get_keyerror():
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
+    db = connect("/tmp/test2.dbdb")
+    for i in range(97,108):
+        db.set(i,chr(i))
+    with pytest.raises(KeyError):
+        db.get(5)
+    db.close()
+
+'''
+Functions Being Tested: Get
+Summary: Get KeyError Test 2
+'''
+def get_keyerror2():
+    try:
+        os.remove("/tmp/test2.dbdb")
+    except:
+        None
+    db = connect("/tmp/test2.dbdb")
+    for i in range(97,108):
+        db.set(i,chr(i))
+    try:
+        db.get(5)
+        result = True
+    except:
+        result = False
+    assert result == False
+    db.close()
