@@ -4,6 +4,7 @@ python:
 before_install:
     - pip install pytest pytest-cov
     - pip install coveralls
+    - pip install portalocker
 script:
     - py.test
 after_success:

@@ -2,5 +2,7 @@
 *.pyc
 *.coverage
 *.cache
+*.~
 timeseries/#timeseries.py#
 timeseries/.#timeseries.py                               
+timeseries/smdata
