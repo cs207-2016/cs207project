@@ -1,4 +1,5 @@
 cs207rbtree.py
+setup.cfg
 setup.py
 cs207_rbtree.egg-info/PKG-INFO
 cs207_rbtree.egg-info/SOURCES.txt
