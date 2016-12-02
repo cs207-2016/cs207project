@@ -20,16 +20,12 @@ Example:
 
 '''
 
-
-
 from pytest import raises
 from timeseries import *
 import numpy as np
 import random
 import math
 import datetime
-
-
 
 '''
 Functions Being Tested: Len
