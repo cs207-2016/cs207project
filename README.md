@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
-A library for working with time series. 
+A library for working with time series.
 
 A time series is an ordered series of data point indexed by or associated with time points. See [Wikipedia](https://en.wikipedia.org/wiki/Time_series) for more information.
 
@@ -21,7 +21,7 @@ The time series library is organized into a tree hierarchy. All time series are 
 
 	ts1 = TimeSeries(time_pts, data_pts)
 	ts2 = TimeSeries(time_pts, data_pts2)
-	
+
 	print(ts1)
 	>>> TimeSeries([[0,74.03971533376968]
 	[1,69.27105329040427]
@@ -33,7 +33,7 @@ The time series library is organized into a tree hierarchy. All time series are 
 	[7,46.24432894725656]
 	[8,51.65852295580598]
 	[9,3.9261801482532777]
-	])	
+	])
 
 	print(ts2)
 	>>> TimeSeries([[0,84.16435735195265]
