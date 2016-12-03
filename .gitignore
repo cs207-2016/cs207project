@@ -5,6 +5,11 @@
 *.~
 timeseries/#timeseries.py#
 timeseries/.#timeseries.py                               
+timeseries/smdata
 tests/tsdb
 tests/tsfiles
-timeseries/smdata
+
+tsbtreedb/tsfiles/*
+tsbtreedb/tsdb/*
+*.dat
+*.dbdb

@@ -15,7 +15,7 @@ from tsbtreedb.similarity import vp_similarity_search
 from pytest import raises
 
 '''
-In the current directory, run 'py.test' to run this test file.
+run 'py.test' to run this test file.
 '''
 def test_random_ts():
     ts1 = correlation.random_ts(2)
