@@ -205,7 +205,7 @@ def test_ok4():
 Functions Being Tested: Get
 Summary: Get KeyError Test
 '''
-def get_keyerror():
+def test_get_keyerror():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
@@ -213,7 +213,7 @@ def get_keyerror():
     db = connect("/tmp/test2.dbdb")
     for i in range(97,108):
         db.set(i,chr(i))
-    with pytest.raises(KeyError):
+    with raises(KeyError):
         db.get(5)
     db.close()
 
@@ -221,7 +221,7 @@ def get_keyerror():
 Functions Being Tested: Get
 Summary: Get KeyError Test 2
 '''
-def get_keyerror2():
+def test_get_keyerror2():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
