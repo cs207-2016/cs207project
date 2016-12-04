@@ -13,3 +13,8 @@ tsbtreedb/tsfiles/*
 tsbtreedb/tsdb/*
 *.dat
 *.dbdb
+
+#Virtualenv
+bin
+lib
+include
