@@ -1,0 +1,5 @@
+matplotlib
+scipy
+portalocker
+pytest
+numpy
