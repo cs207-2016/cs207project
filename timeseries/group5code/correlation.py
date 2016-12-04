@@ -1,4 +1,5 @@
 import os, sys
+
 curr_dir = os.getcwd().split('/')
 sys.path.append('/'.join(curr_dir[:-1]))
 ts_dir = curr_dir[:-1]
@@ -9,6 +10,7 @@ import numpy.fft as nfft
 import numpy as np
 from timeseries.timeseries import TimeSeries
 from scipy.stats import norm
+
 
 class correlation():
     '''
@@ -36,6 +38,7 @@ class correlation():
     >>> idx, mcorr = correlation.max_corr_at_phase(standts1, standts2)
     >>> sumcorr = correlation.kernel_corr(standts1, standts2, mult=10)
     '''
+
     @classmethod
     def tsmaker(self, m, s, j):
         '''
@@ -51,8 +54,8 @@ class correlation():
           TimeSeries, a time series with 100 time-value points
         '''
         t = np.arange(0.0, 1.0, 0.01)
-        v = norm.pdf(t, m, s) + j*np.random.randn(100)
-        #return meta, ts.TimeSeries(t, v)
+        v = norm.pdf(t, m, s) + j * np.random.randn(100)
+        # return meta, ts.TimeSeries(t, v)
         return TimeSeries(t, v)
 
     @classmethod
@@ -67,8 +70,8 @@ class correlation():
           A time series with 100 time-value points
         '''
         t = np.arange(0.0, 1.0, 0.01)
-        v = a*np.random.random(100)
-        #return ts.TimeSeries(t, v)
+        v = a * np.random.random(100)
+        # return ts.TimeSeries(t, v)
         return TimeSeries(t, v)
 
     @classmethod
@@ -85,9 +88,9 @@ class correlation():
         time = x._times
         value = x._data
         for i in range(len(value)):
-            value[i] = (value[i]-m)/float(s)
+            value[i] = (value[i] - m) / float(s)
         return TimeSeries(time, value)
-        #return (x-m)/s
+        # return (x-m)/s
 
     @classmethod
     def ccor(self, ts1, ts2):
@@ -100,7 +103,7 @@ class correlation():
         Returns:
           float, the two time series' cross-correlation.
         '''
-        #your code here
+        # your code here
         result = nfft.fft(nfft.ifft(ts1._data) * np.conj(nfft.ifft(ts2._data)))
         return np.real(result)
 
@@ -123,13 +126,13 @@ class correlation():
         maxcorr = ccorts[idx]
         return idx, maxcorr
 
-    #The equation for the kernelized cross correlation is given at
-    #http://www.cs.tufts.edu/~roni/PUB/ecml09-tskernels.pdf
-    #normalize the kernel there by np.sqrt(K(x,x)K(y,y)) so that the correlation
-    #of a time series with itself is 1.
+    # The equation for the kernelized cross correlation is given at
+    # http://www.cs.tufts.edu/~roni/PUB/ecml09-tskernels.pdf
+    # normalize the kernel there by np.sqrt(K(x,x)K(y,y)) so that the correlation
+    # of a time series with itself is 1.
 
     @classmethod
-    def kernel_corr(self, ts1, ts2, mult = 1):
+    def kernel_corr(self, ts1, ts2, mult=1):
         '''
         Given two standardized time series, compute a kernelized correlation so that
         we can get a real distance. The kernel is normalized so that
@@ -141,13 +144,13 @@ class correlation():
         mult : int, multiplicative constant in the kernel correlation
         Returns: float: kernel correlation between two time series.
         '''
-        #your code here.
-        k_11 = np.sum(np.exp(mult * self.ccor(ts1,ts1)))
-        k_22 = np.sum(np.exp(mult * self.ccor(ts2,ts2)))
-        return np.sum(np.exp(mult * self.ccor(ts1,ts2))) / np.sqrt(k_11*k_22)
+        # your code here.
+        k_11 = np.sum(np.exp(mult * self.ccor(ts1, ts1)))
+        k_22 = np.sum(np.exp(mult * self.ccor(ts2, ts2)))
+        return np.sum(np.exp(mult * self.ccor(ts1, ts2))) / np.sqrt(k_11 * k_22)
 
     @classmethod
-    def kernel_corr_dist(self, ts1, ts2, mult = 1):
+    def kernel_corr_dist(self, ts1, ts2, mult=1):
         '''
         Given two standardized time series, compute a distance between the two time
         series. If the kernel correlation of the two time series is one, then the distance
@@ -161,9 +164,9 @@ class correlation():
         '''
         return 2 * (1 - self.kernel_corr(ts1, ts2, mult))
 
-#this is for a quick and dirty test of these functions
-#you might need to add procs to pythonpath for this to work
-#if __name__ == "__main__":
+# this is for a quick and dirty test of these functions
+# you might need to add procs to pythonpath for this to work
+# if __name__ == "__main__":
 #    print("HI")
 #    t1 = tsmaker(0.5, 0.1, 0.01)
 #    t2 = tsmaker(0.5, 0.1, 0.01)
