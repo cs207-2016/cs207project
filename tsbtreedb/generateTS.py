@@ -1,4 +1,5 @@
 import os, sys
+
 curr_dir = os.getcwd().split('/')
 sys.path.append('/'.join(curr_dir[:-1]))
 ts_dir = curr_dir[:-1]
@@ -21,7 +22,8 @@ then call 'generateTS(num_of_ts)' to generate num_of_ts(an integer) time series
 All time series files will be saved in a folder called 'tsfiles'
 '''
 
-def generate_ts(num_of_ts = 50):
+
+def generate_ts(num_of_ts=50):
     '''
     Generate a set of time series, and each time series has 100 time-value points.
     The mean of each time series values is a number uniformly chosen from 0 and 1.
@@ -45,16 +47,16 @@ def generate_ts(num_of_ts = 50):
     # initialize dictionaries for time series and their metadata
     primary_keys = []
     ts_dict = {}
-    #meta_dict = {}
+    # meta_dict = {}
 
     # fill dictionaries with randomly generated entries for database
     for i, m, s, j in zip(range(num_ts), mus, sigs, jits):
         tsrs = correlation.tsmaker(m, s, j)  # generate data
         pk = "ts_{}".format(i)  # generate primary key
-        #print (pk)
-        primary_keys.append(pk) # keep track of all primary keys
+        # print (pk)
+        primary_keys.append(pk)  # keep track of all primary keys
         ts_dict[pk] = tsrs  # store time series data
-    #print ('tsdict', tsdict)
+    # print ('tsdict', tsdict)
 
     i = 0
     directory = "tsfiles"
@@ -62,13 +64,13 @@ def generate_ts(num_of_ts = 50):
         os.makedirs(directory)
 
     for key in sorted(ts_dict.keys()):
-        #print (key)
+        # print (key)
         ts = ts_dict[key]
         time = ts._times
         value = ts._data
 
-        file_name = "tsfiles/"+key+".dat"
-        #print (file_name)
+        file_name = "tsfiles/" + key + ".dat"
+        # print (file_name)
         try:
             f = open(file_name, 'w')
         except IOError:
@@ -87,8 +89,7 @@ def generate_ts(num_of_ts = 50):
 
     return ts_dict
 
-
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    num_ts = sys.argv[1]
-    #print(num_ts)
+# print(num_ts)
 #    ts_dict = generate_ts(num_ts)

@@ -4,13 +4,13 @@ import portalocker
 import pickle
 import uuid
 
+
 class Color(object):
     '''The Color class implemented using Python.
        The Color object includes two colors: RED and BLACK.
     '''
     RED = 0
     BLACK = 1
-
 
 
 class ValueRef(object):
@@ -33,14 +33,15 @@ class ValueRef(object):
            get: The function that reads bytes for value from disk.
            store: The function that stores bytes for value to disk.
     '''
+
     def __init__(self, referent=None, address=0):
         '''The constructor to initialize a ValueRef object.
            Param:
                referent: the value to store.
                address: the address to store at.
         '''
-        self._referent = referent #value to store
-        self._address = address #address to store at
+        self._referent = referent  # value to store
+        self._address = address  # address to store at
 
     @property
     def address(self):
@@ -93,11 +94,10 @@ class ValueRef(object):
            Param:
                storage: the place to store the value.
         '''
-        #called by BinaryNode.store_refs
+        # called by BinaryNode.store_refs
         if self._referent is not None and not self._address:
             self.prepare_to_store(storage)
             self._address = storage.write(self.referent_to_bytes(self._referent))
-
 
 
 class RBNodeRef(ValueRef):
@@ -112,7 +112,8 @@ class RBNodeRef(ValueRef):
           referent_to_bytes: The function that uses pickle to convert node to string.
           bytes_to_referent: The function that unpickles string to get a node object.
     '''
-    #calls the BinaryNode's store_refs
+
+    # calls the BinaryNode's store_refs
     def prepare_to_store(self, storage):
         '''The function that have a node store its refs.
            Param:
@@ -155,7 +156,6 @@ class RBNodeRef(ValueRef):
         )
 
 
-
 class RBNode(object):
     '''The RBNode class implemented using Python.
        RBNode is the node in RedBlackTree.
@@ -177,6 +177,7 @@ class RBNode(object):
            blacken: The function to blacken the RBNode if it is red.
            is_red(self): The method to check is a node is a red node.
     '''
+
     @classmethod
     def from_node(cls, node, **kwargs):
         '''The function that clones a node with some changes from another one.
@@ -190,7 +191,7 @@ class RBNode(object):
             key=kwargs.get('key', node.key),
             value_ref=kwargs.get('value_ref', node.value_ref),
             right_ref=kwargs.get('right_ref', node.right_ref),
-            color = kwargs.get('color', node.color),
+            color=kwargs.get('color', node.color),
         )
 
     def __init__(self, left_ref, key, value_ref, right_ref, color):
@@ -214,10 +215,10 @@ class RBNode(object):
                storage: the place to store the RBNode's stuff.
         '''
         self.value_ref.store(storage)
-        #calls BinaryNodeRef.store. which calls
-        #BinaryNodeRef.prepate_to_store
-        #which calls this again and recursively stores
-        #the whole tree
+        # calls BinaryNodeRef.store. which calls
+        # BinaryNodeRef.prepate_to_store
+        # which calls this again and recursively stores
+        # the whole tree
         self.left_ref.store(storage)
         self.right_ref.store(storage)
 
@@ -234,10 +235,10 @@ class RBNode(object):
             )
         return self
 
-    #def is_empty(self):
+    # def is_empty(self):
     #    return False
 
-    #def is_black(self):
+    # def is_black(self):
     #    return self.color == Color.BLACK
 
     def is_red(self):
@@ -246,7 +247,6 @@ class RBNode(object):
                boolean, whether or not the node is a red one.
         '''
         return self.color == Color.RED
-
 
 
 class RedBlackTree(object):
@@ -280,6 +280,7 @@ class RedBlackTree(object):
            find_all_smaller: The function to get a list of values that are smaller than the given one.
            inorder: The function to do an inorder traversal of the RedBlackTree.
     '''
+
     def __init__(self, storage):
         '''The constructor to initialize a RedBlackTree object.
            Param:
@@ -291,9 +292,9 @@ class RedBlackTree(object):
     def commit(self):
         '''The funtion to get reference to new tree if it has changed.
         '''
-        #triggers BinaryNodeRef.store
+        # triggers BinaryNodeRef.store
         self._tree_ref.store(self._storage)
-        #make sure address of new tree is stored
+        # make sure address of new tree is stored
         self._storage.commit_root_address(self._tree_ref.address)
 
     def _refresh_tree_ref(self):
@@ -307,14 +308,14 @@ class RedBlackTree(object):
            Param:
                key: the key for getting the corresponding to the key.
         '''
-        #your code here
-        #if tree is not locked by another writer
-        #refresh the references and get new tree if needed
+        # your code here
+        # if tree is not locked by another writer
+        # refresh the references and get new tree if needed
         if not self._storage.locked:
             self._refresh_tree_ref()
-        #get the top level node
+        # get the top level node
         node = self._follow(self._tree_ref)
-        #traverse until you find appropriate node
+        # traverse until you find appropriate node
         while node is not None:
             if key < node.key:
                 node = self._follow(node.left_ref)
@@ -330,16 +331,15 @@ class RedBlackTree(object):
                key: the key to set value with.
                value: the value to be set.
         '''
-        #try to lock the tree. If we succeed make sure
-        #we dont lose updates from any other process
+        # try to lock the tree. If we succeed make sure
+        # we dont lose updates from any other process
         if self._storage.lock():
             self._refresh_tree_ref()
-        #get current top-level node and make a value-ref
+        # get current top-level node and make a value-ref
         node = self._follow(self._tree_ref)
         value_ref = ValueRef(value)
-        #insert and get new tree ref
+        # insert and get new tree ref
         self._tree_ref = self._insert(node, key, value_ref)
-
 
     def _insert(self, node, key, value_ref):
         '''The function that insert a new node creating a new path from root.
@@ -350,9 +350,9 @@ class RedBlackTree(object):
            Return:
                return a new copy of the RedBlackTree after insertion after blacken.
         '''
-        #create a tree ifnthere was none so far
+        # create a tree ifnthere was none so far
         new_node = self._follow(self.update(node, key, value_ref))
-        return RBNodeRef(referent = new_node.blacken())
+        return RBNodeRef(referent=new_node.blacken())
 
     def update(self, node, key, value_ref):
         '''The function to find the insertion point.
@@ -376,18 +376,17 @@ class RedBlackTree(object):
                 node,
                 right_ref=self.update(
                     self._follow(node.right_ref), key, value_ref))
-        else: #create a new node to represent this data
+        else:  # create a new node to represent this data
             new_node = RBNode.from_node(node, value_ref=value_ref)
         new_node = self.balance(new_node)
         return RBNodeRef(referent=new_node)
-
 
     def _follow(self, ref):
         '''The function to get a node from a reference.
            Param:
                ref: the RBNodeRef to get node from.
         '''
-        #calls BinaryNodeRef.get
+        # calls BinaryNodeRef.get
         return ref.get(self._storage)
 
     def rotate_left(self, node):
@@ -399,7 +398,7 @@ class RedBlackTree(object):
         '''
         return RBNode(
             RBNodeRef(
-                referent = RBNode.from_node(node, right_ref = self._follow(node.right_ref).left_ref)
+                referent=RBNode.from_node(node, right_ref=self._follow(node.right_ref).left_ref)
             ),
             self._follow(node.right_ref).key,
             self._follow(node.right_ref).value_ref,
@@ -419,7 +418,7 @@ class RedBlackTree(object):
             self._follow(node.left_ref).key,
             self._follow(node.left_ref).value_ref,
             RBNodeRef(
-                referent = RBNode.from_node(node, left_ref = self._follow(node.left_ref).right_ref)
+                referent=RBNode.from_node(node, left_ref=self._follow(node.left_ref).right_ref)
             ),
             color=self._follow(node.left_ref).color,
         )
@@ -432,10 +431,10 @@ class RedBlackTree(object):
                the RBNode after recolor.
         '''
         return RBNode(
-            left_ref = RBNodeRef(referent = self._follow(node.left_ref).blacken()),
-            key = node.key,
-            value_ref = node.value_ref,
-            right_ref = RBNodeRef(referent = self._follow(node.right_ref).blacken()),
+            left_ref=RBNodeRef(referent=self._follow(node.left_ref).blacken()),
+            key=node.key,
+            value_ref=node.value_ref,
+            right_ref=RBNodeRef(referent=self._follow(node.right_ref).blacken()),
             color=Color.RED,
         )
 
@@ -471,10 +470,10 @@ class RedBlackTree(object):
                 return self.recolored(self.rotate_right(node))
             if left_right is not None and left_right.is_red():
                 new_node = RBNode.from_node(
-                        node,
-                        left_ref = RBNodeRef(referent = self.rotate_left(node_left)),
-                        color = node.color,
-                    )
+                    node,
+                    left_ref=RBNodeRef(referent=self.rotate_left(node_left)),
+                    color=node.color,
+                )
                 return self.recolored(self.rotate_right(new_node))
             return node
 
@@ -483,10 +482,10 @@ class RedBlackTree(object):
                 return self.recolored(self.rotate_left(node))
             if right_left is not None and right_left.is_red():
                 new_node = RBNode.from_node(
-                        node,
-                        right_ref = RBNodeRef(referent = self.rotate_right(node_right)),
-                        color = node.color,
-                    )
+                    node,
+                    right_ref=RBNodeRef(referent=self.rotate_right(node_right)),
+                    color=node.color,
+                )
                 return self.recolored(self.rotate_left(new_node))
         return node
 
@@ -500,7 +499,7 @@ class RedBlackTree(object):
         smaller_list = []
         if not self._storage.locked:
             self._refresh_tree_ref()
-        #get the top level node
+        # get the top level node
         root = self._tree_ref
         self.inorder(root, smaller_list, val)
         return smaller_list
@@ -513,7 +512,7 @@ class RedBlackTree(object):
                val: the value to compare with.
         '''
         node = self._follow(root)
-        if node is not None :
+        if node is not None:
             self.inorder(node.left_ref, smaller_list, val)
             if node.key > val:
                 return
@@ -568,7 +567,7 @@ class Storage(object):
         '''
         self._f = f
         self.locked = False
-        #we ensure that we start in a sector boundary
+        # we ensure that we start in a sector boundary
         self._ensure_superblock()
 
     def _ensure_superblock(self):
@@ -641,9 +640,9 @@ class Storage(object):
            Param:
                data: the data to write.
         '''
-        #first lock, get to end, get address to return, write size
-        #write data, unlock <==WRONG, dont want to unlock here
-        #your code here
+        # first lock, get to end, get address to return, write size
+        # write data, unlock <==WRONG, dont want to unlock here
+        # your code here
         self.lock()
         self._seek_end()
         object_address = self._f.tell()
@@ -668,9 +667,9 @@ class Storage(object):
         '''
         self.lock()
         self._f.flush()
-        #make sure you write root address at position 0
+        # make sure you write root address at position 0
         self._seek_superblock()
-        #write is atomic because we store the address on a sector boundary.
+        # write is atomic because we store the address on a sector boundary.
         self._write_integer(root_address)
         self._f.flush()
         self.unlock()
@@ -680,8 +679,8 @@ class Storage(object):
            Return:
                root_address.
         '''
-        #read the first integer in the file
-        #your code here
+        # read the first integer in the file
+        # your code here
         self._seek_superblock()
         root_address = self._read_integer()
         return root_address
@@ -697,9 +696,6 @@ class Storage(object):
         '''The function to check whether the storage is closed.
         '''
         return self._f.closed
-
-
-
 
 
 class DBDB(object):
@@ -727,6 +723,7 @@ class DBDB(object):
            set: The function to set the value associated the key given.
            find_all_smaller: The function to get a list of values that are smaller than the given one.
     '''
+
     def __init__(self, f):
         '''The constructor to initialize a DBDB object.
            Param:
@@ -799,9 +796,6 @@ def connect(dbname):
         fd = os.open(dbname, os.O_RDWR | os.O_CREAT)
         f = os.fdopen(fd, 'r+b')
     return DBDB(f)
-
-
-
 
 
 '''
