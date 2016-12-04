@@ -23,9 +23,10 @@ Example:
 
 
 from pytest import raises
-from timeseries import *
 import numpy as np
 import random
+
+from .context import *
 
 ##### ArrayTimeSeries Tests ####
 

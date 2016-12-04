@@ -23,14 +23,13 @@ Example:
 
 
 from pytest import raises
-from cs207rbtree import *
 import numpy as np
 import random
 import math
 import datetime
 import os
 
-
+from .context import *
 
 '''
 Functions Being Tested: Get

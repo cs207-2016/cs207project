@@ -6,8 +6,8 @@ import numbers
 import datetime
 import sys
 
-from lazy import *
-from interfaces import *
+from .helpers import *
+from .interfaces import *
 
 class TimeSeries(SizedContainerTimeSeriesInterface):
     def __init__(self, time_points, data_points):
@@ -95,50 +95,6 @@ class ArrayTimeSeries(TimeSeries):
     def __sizeof__(self):
         '''Returns the size in bytes of the time series storage.'''
         return sys.getsizeof(self._times) + sys.getsizeof(self._data)
-    
-class StreamTimeSeriesInterface(TimeSeriesInterface):
-    '''Creates an interface for a Timeseries with no internal storage that
-    yields data based on a generator '''
-
-    @abc.abstractmethod
-    def produce(self)->tuple:
-        '''Generate (time, value) tuples'''
-
-    def online_std(self, chunk=1):
-        "Online standard deviation"
-        def gen():
-            n = 0
-            mu = 0
-            dev_accum = 0
-            for i in range(chunk):
-                tmp = next(self._gen)
-                (time, value) = (tmp[0], tmp[1])
-                n += 1
-                delta = value - mu
-                dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
-                mu = mu + delta/n
-                if n==1:
-                    stddev = 0
-                    yield (time, stddev)
-                elif n > 1:
-                    stddev = math.sqrt(dev_accum/(n-1))
-                    yield (time, stddev)
-        return SimulatedTimeSeries(gen())
-
-    def online_mean(self, chunk=1):
-        "Online mean"
-        def gen():
-            n = 0
-            mu = 0
-            for i in range(chunk):
-                tmp = next(self._gen)
-                (time, value) = (tmp[0], tmp[1])
-                n += 1
-                delta = value - mu
-                mu = mu + delta/n
-                yield (time, mu)
-        return SimulatedTimeSeries(gen())
-
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
     '''A time series with no internal storage. 
@@ -195,3 +151,38 @@ class SimulatedTimeSeries(StreamTimeSeriesInterface):
             else:
                 values.append((int(datetime.datetime.now().timestamp()), value))
         return values
+
+    def online_std(self, chunk=1)->StreamTimeSeriesInterface:
+        "Online standard deviation"
+        def gen():
+            n = 0
+            mu = 0
+            dev_accum = 0
+            for i in range(chunk):
+                tmp = next(self._gen)
+                (time, value) = (tmp[0], tmp[1])
+                n += 1
+                delta = value - mu
+                dev_accum=dev_accum+(value-mu)*(value-mu-delta/n)
+                mu = mu + delta/n
+                if n==1:
+                    stddev = 0
+                    yield (time, stddev)
+                elif n > 1:
+                    stddev = math.sqrt(dev_accum/(n-1))
+                    yield (time, stddev)
+        return SimulatedTimeSeries(gen())
+
+    def online_mean(self, chunk=1)->StreamTimeSeriesInterface:
+        "Online mean"
+        def gen():
+            n = 0
+            mu = 0
+            for i in range(chunk):
+                tmp = next(self._gen)
+                (time, value) = (tmp[0], tmp[1])
+                n += 1
+                delta = value - mu
+                mu = mu + delta/n
+                yield (time, mu)
+        return SimulatedTimeSeries(gen())

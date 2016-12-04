@@ -1,17 +1,22 @@
 import os, sys
-curr_dir = os.getcwd().split('/')
-print(curr_dir)
-sys.path.append('/'.join(curr_dir))
-ts_dir = curr_dir
-ts_dir.append('timeseries')
-sys.path.append('/'.join(ts_dir))
+#curr_dir = os.getcwd().split('/')
+#print(curr_dir)
+#sys.path.append('/'.join(curr_dir))
+#ts_dir = curr_dir
+#ts_dir.append('timeseries')
+#sys.path.append('/'.join(ts_dir))
 
 import numpy as np
-from timeseries.timeseries import TimeSeries
+
+from .context import TimeSeries, tsbtreedb
+
+#from timeseries.timeseries import TimeSeries
 from tsbtreedb.correlation import correlation
 from tsbtreedb.generateTS import generate_ts
 from tsbtreedb.generateDB import generateDB
 from tsbtreedb.similarity import vp_similarity_search
+
+
 from pytest import raises
 
 '''

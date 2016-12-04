@@ -305,3 +305,20 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         for i in iter(self):
             s += (mean - i)**2
         return math.sqrt(s / (len(self) - 1))
+
+    
+class StreamTimeSeriesInterface(TimeSeriesInterface):
+    '''Creates an interface for a Timeseries with no internal storage that
+    yields data based on a generator '''
+
+    @abc.abstractmethod
+    def produce(self)->tuple:
+        '''Generate (time, value) tuples'''
+
+    @abc.abstractmethod
+    def online_std(self, chunk=1):
+        "Online standard deviation"
+
+    @abc.abstractmethod
+    def online_mean(self, chunk=1):
+        "Online mean"
