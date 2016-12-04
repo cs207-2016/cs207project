@@ -7,7 +7,11 @@ def serialize(json_obj):
     '''Turn a JSON object into bytes suitable for writing out to the network.
     Includes a fixed-width length field to simplify reconstruction on the other
     end of the wire.'''
-    #your code here
+    json_string = json.dumps(json_obj)
+
+    json_bytes = json_string.encode('utf-8')
+    length_bytes = (len(json_bytes)+LENGTH_FIELD_LENGTH).to_bytes(LENGTH_FIELD_LENGTH, byteorder="little")
+    return length_bytes + json_bytes
 
 
 
