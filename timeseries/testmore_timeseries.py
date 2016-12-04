@@ -1,4 +1,4 @@
-''''
+"""'
 
 Authors:
 Sophie Hilgard
@@ -17,7 +17,7 @@ Example:
         $ source activate py35
         $ py.test testmore_timeseries.py
 
-'''
+"""
 
 from pytest import raises
 from timeseries import *

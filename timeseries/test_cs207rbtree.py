@@ -1,4 +1,4 @@
-''''
+"""'
 
 Authors:
 Sophie Hilgard
@@ -17,7 +17,7 @@ Example:
         $ source activate py35
         $ py.test test_cs207rbtree.py
 
-'''
+"""
 
 from pytest import raises
 from cs207rbtree import *
@@ -82,9 +82,9 @@ def test_gt():
         db.set(i, chr(i))
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    while node != None:
+    while node is not None:
         next_node = tree._follow(node.right_ref)
-        if next_node != None:
+        if next_node is not None:
             assert next_node.key > node.key
         node = next_node
     db.close()
@@ -104,9 +104,9 @@ def test_lt():
         db.set(i, chr(i))
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    while node != None:
+    while node is not None:
         next_node = tree._follow(node.left_ref)
-        if next_node != None:
+        if next_node is not None:
             assert next_node.key < node.key
         node = next_node
     db.close()
@@ -258,5 +258,5 @@ def test_get_keyerror2():
         result = True
     except:
         result = False
-    assert result == False
+    assert result is False
     db.close()

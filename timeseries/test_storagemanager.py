@@ -1,4 +1,4 @@
-''''
+"""'
 
 Authors:
 Sophie Hilgard
@@ -16,7 +16,7 @@ Example:
     Example how to run this test
         $ source activate py35
         $ py.test test_storagemanager.py
-'''
+"""
 
 from pytest import raises
 from random import *

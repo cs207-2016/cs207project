@@ -1,4 +1,4 @@
-''''
+"""'
 
 Authors:
 Sophie Hilgard
@@ -17,7 +17,7 @@ Example:
         $ source activate py35
         $ py.test test_timeseries.py
 
-'''
+"""
 
 from pytest import raises
 from timeseries import *
@@ -358,7 +358,7 @@ Summary: Basic Bools Test (True)
 
 def test_bool():
     ts = TimeSeries([1, 2, 3, 4], [100, 101, 102, 103])
-    assert bool(ts) == True
+    assert bool(ts) is True
 
 
 '''
@@ -369,7 +369,7 @@ Summary: Basic Bools Test (False)
 
 def test_bool_false():
     ts = TimeSeries([1, 2, 3, 4], [0, 0, 0, 0])
-    assert bool(ts) == False
+    assert bool(ts) is False
 
 
 '''

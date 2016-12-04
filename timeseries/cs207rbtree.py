@@ -200,7 +200,7 @@ class BinaryNodeRef(ValueRef):
 
     # calls the BinaryNode's store_refs
     def prepare_to_store(self, storage):
-        "have a node store its refs"
+        """have a node store its refs"""
         if self._referent:
             self._referent.store_refs(storage)
 
@@ -375,7 +375,8 @@ class BinaryTree(object):
             print("right of ", node.key)
             self.printNode(right_node)
 
-    def blacken(self, node):
+    @staticmethod
+    def blacken(node):
         """If a node is red, change its color to black"""
         if node.is_red():
             return BinaryNode.from_node(node, color=Color.BLACK)
@@ -390,7 +391,8 @@ class BinaryTree(object):
                                         referent=self.blacken(BinaryNode.from_node(self._follow(node.right_ref)))),
                                     color=Color.RED)
 
-    def is_empty(node):
+    @staticmethod
+    def is_empty():
         return False
 
     def rotate_left(self, node):
@@ -415,36 +417,36 @@ class BinaryTree(object):
         if node.is_red():
             return node
 
-        if self._follow(node.left_ref) != None:
+        if self._follow(node.left_ref) is not None:
             if self._follow(node.left_ref).is_red():
                 # print ("left: red")
-                if self._follow(node.right_ref) != None:
+                if self._follow(node.right_ref) is not None:
                     if self._follow(node.right_ref).is_red():
                         return self.recolored(node)
 
                 left_node = self._follow(node.left_ref)
                 # print (node.key, node.value_ref._referent, node.color)
                 # print (left_node.key, left_node.value_ref._referent, left_node.color)
-                if self._follow(left_node.left_ref) != None:
+                if self._follow(left_node.left_ref) is not None:
                     if self._follow(left_node.left_ref).is_red():
                         # print ("left, left: black, red")
                         # print ("node", node.key)
                         # print ("node right", node.right_ref)
                         new_node = self.recolored(self.rotate_right(node))
                         return new_node
-                if self._follow(left_node.right_ref) != None:
+                if self._follow(left_node.right_ref) is not None:
                     if self._follow(left_node.right_ref).is_red():
                         return self.balance(BinaryNode.from_node(
                             node,
                             left_ref=BinaryNodeRef(referent=self.rotate_left(self._follow(node.left_ref)))))
 
         right_node = self._follow(node.right_ref)
-        if self._follow(node.right_ref) != None:
+        if self._follow(node.right_ref) is not None:
             if self._follow(node.right_ref).is_red():
-                if self._follow(right_node.right_ref) != None:
+                if self._follow(right_node.right_ref) is not None:
                     if self._follow(right_node.right_ref).is_red():
                         return self.recolored(self.rotate_left(node))
-                if self._follow(right_node.left_ref) != None:
+                if self._follow(right_node.left_ref) is not None:
                     if self._follow(right_node.left_ref).is_red():
                         #                         return self.recolored(self.rotate_left(BinaryNode.from_node(
                         #                         node,

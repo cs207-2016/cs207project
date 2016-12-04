@@ -1,38 +1,42 @@
 import abc
-import numpy as np
-import os, os.path
+import os
+import os.path
 import sys
 
+import numpy as np
 from interfaces import SizedContainerTimeSeriesInterface
+
 from timeseries import ArrayTimeSeries
 
 
 class StorageManagerInterface(abc.ABC):
-    '''An interface for managing persistent storage of time series under an identifier.'''
+    """An interface for managing persistent storage of time series under an identifier."""
 
     @abc.abstractmethod
     def store(ident, ts) -> SizedContainerTimeSeriesInterface:
-        '''Store time series `ts` associated with id `ident.`'''
+        """Store time series `ts` associated with id `ident.`"""
 
     @abc.abstractmethod
     def size(ident) -> int:
-        '''Return size of time series associated with id `ident`.'''
+        """Return size of time series associated with id `ident`."""
 
     @abc.abstractmethod
     def get(ident) -> SizedContainerTimeSeriesInterface:
-        '''Return time series associated with id `ident`.'''
+        """Return time series associated with id `ident`."""
 
 
 class FileStorageManager(StorageManagerInterface):
-    '''Manages time series storage. 
-    Underlying on-disk representation for a time series is a single npy file containing an array containing two arrays, one for data, the other for time points. 
-    The user executing the script must have r/w permissions for the storage directory.'''
+    """Manages time series storage.
+    Underlying on-disk representation for a time series is a single npy file
+        containing an array containing two arrays, one for data, the other for time points.
+    The user executing the script must have r/w permissions for the storage directory."""
 
     def __init__(self, path='./smdata', max_cache_size=4.0):
-        '''Create a new FileStorageManager.
+        """Create a new FileStorageManager.
         Args:
-            `path` (string): The path to the file storage directory. Must have r/w permissions.        This constructor will attempt to create the directory if it does not exist.
-            `cache_size` (float): The size in MB of the time series cache.'''
+            `path` (string): The path to the file storage directory. Must have r/w permissions.
+                This constructor will attempt to create the directory if it does not exist.
+            `cache_size` (float): The size in MB of the time series cache."""
 
         # Create storage directory if it does not exist
         # TODO: Handle exception? Test.
@@ -52,12 +56,12 @@ class FileStorageManager(StorageManagerInterface):
         self._cache_size = 0
 
     def store(self, ident, ts):
-        '''Store a time series under an identifier. 
+        """Store a time series under an identifier.
            If the identifier is currently in use, the existing time series will be overwritten.
 
         Args:
              `ident`(string): The identifier for the time series.
-             `ts`(SizedContainerTimeSeriesInterface): The time series to store.'''
+             `ts`(SizedContainerTimeSeriesInterface): The time series to store."""
 
         fname = '{}/{}.npy'.format(self._storage, str(ident))
         times = np.array(list(ts.itertimes()))
@@ -67,24 +71,24 @@ class FileStorageManager(StorageManagerInterface):
         self._cache_store(ident, ts)
 
     def size(self, ident):
-        '''Returns the length of the time series stored under the identifier `ident.`
+        """Returns the length of the time series stored under the identifier `ident.`
 
         Args:
            `ident` (string): The identifier for the time series.
 
         Raises:
-            KeyError: No time series is stored under identifier `ident`.'''
+            KeyError: No time series is stored under identifier `ident`."""
 
         return len(self.get(ident))
 
     def get(self, ident):
-        '''Returns the time series stored under the identifier `ident`.
-        
-        Args: 
+        """Returns the time series stored under the identifier `ident`.
+
+        Args:
              `ident` (string): The identifier for the time series to retrieve.
 
-        Raises: 
-             KeyError: No time series was found under identifier `ident`.'''
+        Raises:
+             KeyError: No time series was found under identifier `ident`."""
 
         # First try to retrieve from cache
         try:
@@ -103,13 +107,14 @@ class FileStorageManager(StorageManagerInterface):
         return ats
 
     def _cache_store(self, ident, ts):
-        '''Stores the given time series under the given identifier in the cache.
-        This function will clear 'stale' time series from the cache if the cache grows larger than the FileStorageManager's maximum cache size.
+        """Stores the given time series under the given identifier in the cache.
+        This function will clear 'stale' time series from the cache if the cache grows larger
+            than the FileStorageManager's maximum cache size.
         Any existing time series will be overwritten.
 
         Args:
             `ident` (string): The identifier for the time series.
-            `ts` (SizedContainerTimeSeriesInterface): The time series to store.'''
+            `ts` (SizedContainerTimeSeriesInterface): The time series to store."""
 
         # Add size of time series to the total size of cache
         self._cache_size += sys.getsizeof(ts)
@@ -139,13 +144,13 @@ class FileStorageManager(StorageManagerInterface):
         self._cache_order.append(ident)
 
     def _cache_get(self, ident):
-        '''Returns the time series stored under the given identifier in the cache.
+        """Returns the time series stored under the given identifier in the cache.
 
         Args:
             `ident`(string): The identifier for the time series.
 
         Raises:
-             KeyError: No time series was stored in the cache under the identifier `ident`.'''
+             KeyError: No time series was stored in the cache under the identifier `ident`."""
 
         try:
             ts = self._cache[ident]
@@ -163,20 +168,21 @@ class SMTimeSeries(SizedContainerTimeSeriesInterface):
     _fsm = None
 
     def __init__(self, time_points=None, data_points=None, ident=None, sm=None):
-        '''Implements the SizedContainerTimeSeriesInterface using a StorageManager for storage.
+        """Implements the SizedContainerTimeSeriesInterface using a StorageManager for storage.
            If no `ident` is supplied, identical time series will receive the same identifier.
 
             Args:
                 `time_points` (sequence): A sequence of time points. Must have length equal to `data_points.`
                 `data_points` (sequence): A sequence of data points. Must have length equal to `time_points.`
-                `ident` (int or string): An identifier for the time series. 
-                                         If it is already in use by the FileStorageManager, the existing SMTimeSeries will be overwritten. 
+                `ident` (int or string): An identifier for the time series.
+                                         If it is already in use by the FileStorageManager, the existing SMTimeSeries
+                                            will be overwritten.
                                          If not supplied, an identifier will be generated from the hash of the data.
-                `sm` (StorageManager): A storage manager to use for underlying storage. 
+                `sm` (StorageManager): A storage manager to use for underlying storage.
                                        If not supplied, the class storage manager will be used be default.
-                     
+
             Returns:
-                SMTimeSeries: A time series containing time and data points.'''
+                SMTimeSeries: A time series containing time and data points."""
 
         if ident is None:
             ident = hash((tuple(time_points), tuple(data_points)))
@@ -209,23 +215,23 @@ class SMTimeSeries(SizedContainerTimeSeriesInterface):
         return obj
 
     def __len__(self):
-        '''The length of the time series.
+        """The length of the time series.
         Returns:
-           int: The number of elements in the time series.'''
+           int: The number of elements in the time series."""
 
         return self._sm.size(self._ident)
 
     def __iter__(self):
-        '''An iterable over the data points of the time series.
+        """An iterable over the data points of the time series.
         Returns:
-            iterable: An iterable over the data points of the time series.'''
+            iterable: An iterable over the data points of the time series."""
 
         return iter(self._sm.get(self._ident))
 
     def itertimes(self):
-        '''Returns an iterator over the TimeSeries times'''
+        """Returns an iterator over the TimeSeries times"""
         return self._sm.get(self._ident).itertimes()
 
     def __sizeof__(self):
-        '''Returns the size in bytes of the time series storage.'''
+        """Returns the size in bytes of the time series storage."""
         return sys.getsizeof(self._sm.get(self._ident))
