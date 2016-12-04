@@ -58,3 +58,11 @@ class TSDB_Server(socketserver.BaseServer):
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR, tsdbop['op'])
 
             return serialize(response.to_json())
+
+    def _with_ts(self, TSDBOp):
+
+        return None
+
+    def _with_id(self, TSDBOp):
+
+        return None
