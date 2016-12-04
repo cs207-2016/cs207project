@@ -1,4 +1,3 @@
-
 ''''
 
 Authors:
@@ -20,8 +19,6 @@ Example:
 
 '''
 
-
-
 from pytest import raises
 from cs207rbtree import *
 import numpy as np
@@ -30,36 +27,39 @@ import math
 import datetime
 import os
 
-
-
 '''
 Functions Being Tested: Get
 Summary: Basic Get Test
 '''
+
+
 def test_get():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
     value = db.get(97)
     assert value == 'a'
     db.close()
+
 
 '''
 Functions Being Tested: Commit
 Summary: Basic Commit Test
 '''
+
+
 def test_commit():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
     db.commit()
     db.close()
     db = connect("/tmp/test2.dbdb")
@@ -67,168 +67,192 @@ def test_commit():
     assert value == 'b'
     db.close()
 
+
 '''
 Tree Properties Being Tested: Right Child > Parent
 Summary: Testing Tree GT Property
 '''
+
+
 def test_gt():
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
-    for i in range(119,109,-1):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
+    for i in range(119, 109, -1):
+        db.set(i, chr(i))
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    while node!=None:
+    while node != None:
         next_node = tree._follow(node.right_ref)
-        if next_node!=None:
+        if next_node != None:
             assert next_node.key > node.key
         node = next_node
     db.close()
+
 
 '''
 Tree Properties Being Tested: Left Child < Parent
 Summary: Testing Tree LT Property
 '''
+
+
 def test_lt():
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
-    for i in range(119,109,-1):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
+    for i in range(119, 109, -1):
+        db.set(i, chr(i))
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    while node!=None:
+    while node != None:
         next_node = tree._follow(node.left_ref)
-        if next_node!=None:
+        if next_node != None:
             assert next_node.key < node.key
         node = next_node
     db.close()
+
 
 '''
 Tree Properties Being Tested: Okasaki Case 1 Rotation
 Summary: Testing Okasaki Rebalance 1
 '''
+
+
 def test_ok1():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    db.set(3,'c')
-    db.set(1,'a')
-    db.set(2,'b')
+    db.set(3, 'c')
+    db.set(1, 'a')
+    db.set(2, 'b')
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    assert node.key==2
+    assert node.key == 2
     left_node = tree._follow(node.left_ref)
-    assert left_node.key==1
+    assert left_node.key == 1
     right_node = tree._follow(node.right_ref)
-    assert right_node.key==3
+    assert right_node.key == 3
     assert left_node.color == Color.BLACK
     assert right_node.color == Color.BLACK
     db.close()
+
 
 '''
 Tree Properties Being Tested: Okasaki Case 2 Rotation
 Summary: Testing Okasaki Rebalance 2
 '''
+
+
 def test_ok2():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    db.set(3,'c')
-    db.set(2,'b')
-    db.set(1,'a')
+    db.set(3, 'c')
+    db.set(2, 'b')
+    db.set(1, 'a')
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    assert node.key==2
+    assert node.key == 2
     left_node = tree._follow(node.left_ref)
-    assert left_node.key==1
+    assert left_node.key == 1
     right_node = tree._follow(node.right_ref)
-    assert right_node.key==3
+    assert right_node.key == 3
     assert left_node.color == Color.BLACK
     assert right_node.color == Color.BLACK
     db.close()
+
 
 '''
 Tree Properties Being Tested: Okasaki Case 3 Rotation
 Summary: Testing Okasaki Rebalance 3
 '''
+
+
 def test_ok3():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    db.set(1,'a')
-    db.set(2,'b')
-    db.set(3,'c')
+    db.set(1, 'a')
+    db.set(2, 'b')
+    db.set(3, 'c')
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    assert node.key==2
+    assert node.key == 2
     left_node = tree._follow(node.left_ref)
-    assert left_node.key==1
+    assert left_node.key == 1
     right_node = tree._follow(node.right_ref)
-    assert right_node.key==3
+    assert right_node.key == 3
     assert left_node.color == Color.BLACK
     assert right_node.color == Color.BLACK
     db.close()
+
 
 '''
 Tree Properties Being Tested: Okasaki Case 4 Rotation
 Summary: Testing Okasaki Rebalance 4
 '''
+
+
 def test_ok4():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    db.set(1,'a')
-    db.set(3,'c')
-    db.set(2,'b')
+    db.set(1, 'a')
+    db.set(3, 'c')
+    db.set(2, 'b')
     tree = db._tree
     node = tree._follow(tree._tree_ref)
-    assert node.key==2
+    assert node.key == 2
     left_node = tree._follow(node.left_ref)
-    assert left_node.key==1
+    assert left_node.key == 1
     right_node = tree._follow(node.right_ref)
-    assert right_node.key==3
+    assert right_node.key == 3
     assert left_node.color == Color.BLACK
     assert right_node.color == Color.BLACK
     db.close()
+
 
 '''
 Functions Being Tested: Get
 Summary: Get KeyError Test
 '''
+
+
 def test_get_keyerror():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
     with raises(KeyError):
         db.get(5)
     db.close()
+
 
 '''
 Functions Being Tested: Get
 Summary: Get KeyError Test 2
 '''
+
+
 def test_get_keyerror2():
     try:
         os.remove("/tmp/test2.dbdb")
     except:
         None
     db = connect("/tmp/test2.dbdb")
-    for i in range(97,108):
-        db.set(i,chr(i))
+    for i in range(97, 108):
+        db.set(i, chr(i))
     try:
         db.get(5)
         result = True

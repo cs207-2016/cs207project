@@ -1,4 +1,3 @@
-
 ''''
 
 Authors:
@@ -20,8 +19,6 @@ Example:
 
 '''
 
-
-
 from pytest import raises
 from timeseries import *
 import numpy as np
@@ -34,8 +31,8 @@ import random
 Functions Being Tested: interpolate ATS
 Summary: Basic interpolate test
 '''
+
+
 def test_interpolateA_ats():
-    a = ArrayTimeSeries([0,5,10], [1,2,3])
-    assert a.interpolate([1]) == ArrayTimeSeries([1],[1.2])
-
-
+    a = ArrayTimeSeries([0, 5, 10], [1, 2, 3])
+    assert a.interpolate([1]) == ArrayTimeSeries([1], [1.2])

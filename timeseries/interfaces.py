@@ -5,19 +5,22 @@ import numpy as np
 import numbers
 import math
 
+
 class TimeSeriesInterface(abc.ABC):
     '''A series of data points associated with time points.'''
 
     @abc.abstractmethod
     def __iter__(self):
-       '''Iterate over data in TimeSeries'''
+        '''Iterate over data in TimeSeries'''
 
     @abc.abstractmethod
     def iteritems(self):
         '''Iterate over (time, data)'''
+
     @abc.abstractmethod
     def itertimes(self):
         '''Iterate over times'''
+
 
 class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
     '''A TimeSeriesInterface that stores time and data points internally.
@@ -57,7 +60,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
                 raise ValueError('`data_points` must be real numbers')
 
         # Raise exception if there is a duplicate time value
-        if len(np.unique(list(time_points))) !=len(list(time_points)):
+        if len(np.unique(list(time_points))) != len(list(time_points)):
             raise ValueError('`time_points` must not contain duplicates')
 
     @abc.abstractmethod
@@ -71,7 +74,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             `key`(int): The index of the desired data point.
         Returns: 
             numbers.Real: The value stored at the index `key`.'''
-        
+
         return self._data[key]
 
     def __setitem__(self, key, value):
@@ -125,10 +128,10 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         ts = list(pts)
         for t in ts:
             # Get the two time points bounding `pts`
-            times = sorted(enumerate(self.itertimes()), key = lambda x: abs(x[1] - t))[:2]
+            times = sorted(enumerate(self.itertimes()), key=lambda x: abs(x[1] - t))[:2]
             i1, t1 = times[0]
             i2, t2 = times[1]
-            if t <= t1: 
+            if t <= t1:
                 inter_pts.append(self._data[i1])
             elif t >= t2:
                 inter_pts.append(self._data[i2])
@@ -146,7 +149,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         Returns:
             float: The two-norm of the value vector of the time series.'''
 
-        return math.sqrt(sum(x**2 for x in self))
+        return math.sqrt(sum(x ** 2 for x in self))
 
     def __bool__(self):
         '''Determines whether the value vector is of length zero.
@@ -167,7 +170,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
                 ValueError: The RHS is a time series whose time points are not equivalent.
                 NotImplementedError: The RHS is a noncompatible type.'''
 
-        def _check_time_values_helper(self , rhs):
+        def _check_time_values_helper(self, rhs):
             # An internal method for verifying that the other argument in an binary function is valid.
             if isinstance(rhs, numbers.Real):
                 return function(self, rhs)
@@ -176,6 +179,7 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             elif len(self) != len(rhs) or not all(t1 == t2 for t1, t2 in zip(self.itertimes(), rhs.itertimes())):
                 raise ValueError('Both time series must have the same time points.')
             return function(self, rhs)
+
         return _check_time_values_helper
 
     def __neg__(self):
@@ -303,5 +307,5 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
         s = 0
         mean = self.mean()
         for i in iter(self):
-            s += (mean - i)**2
+            s += (mean - i) ** 2
         return math.sqrt(s / (len(self) - 1))
