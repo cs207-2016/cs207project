@@ -57,7 +57,6 @@ class TSDBOp_withTS(TSDBOp):
     def from_json(cls, json_dict):
         return cls(ts.TimeSeries(*(json_dict['ts'])))
 
-
 class TSDBOp_Return(TSDBOp):
 
     def __init__(self, status, op, payload=None):
