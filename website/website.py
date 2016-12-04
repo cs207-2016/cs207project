@@ -17,13 +17,13 @@ class ProductJSONEncoder(JSONEncoder):
 app = Flask(__name__)
 app.json_encoder = ProductJSONEncoder
 
-user = 'ubuntu'
-password = 'cs207password'
+user = 'postgress'
+password = 'cs207isthebest'
 host = 'localhost'
 port = '5432'
-db = 'ubuntu'
+dbname = 'timeseries'
 url = 'postgresql://{}:{}@{}:{}/{}'
-url = url.format(user, password, host, port, db)
+url = url.format(user, password, host, port, dbname)
 app.config['SQLALCHEMY_DATABASE_URI'] = url  # 'sqlite:////tmp/tasks.db'
 db = SQLAlchemy(app)
 
@@ -50,6 +50,8 @@ def get_all_metadata():
     if 'mean_in' in request.args:
         mean_in = request.args.get('mean_in')
         # Do query
+        mean_range=mean_in.split('-')
+        query=db.session.query.filter(db.mean >= float(mean_range[0]) & db.mean < float(mean_range[1]))
     logger.info('Getting all TimeseriesEntries')
     return jsonify(dict(tasks=TimeseriesEntry.query.all()))
 
