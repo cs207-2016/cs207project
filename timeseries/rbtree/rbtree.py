@@ -137,15 +137,28 @@ class DBDB(object):
         self._assert_not_closed()
         self._tree.commit()
 
+    def printTree(self):
+        """Check if the storage file is closed. If not, printTree"""
+        self._assert_not_closed()
+        self._tree.printTree()
+
     def get(self, key):
         """Retrieve the value associated with a key"""
         self._assert_not_closed()
         return self._tree.get(key)
 
+    def get_All_LTE(self, key):
+        "get all Keys and Values with keys less than or equal to passed key"
+        "Returns two lists: first list is of Keys, second lists is of Vals"
+        "where Keys is less than or equal to key"
+        "Uses recursion to find such"
+        self._assert_not_closed()
+        return self._tree.get_All_LTE(key)
+
     def set(self, key, value):
         """Set the value associated with a key"""
         self._assert_not_closed()
-        print(self._tree)
+        #print(self._tree)
         return self._tree.set(key, value)
 
     def delete(self, key):
@@ -317,6 +330,48 @@ class BinaryTree(object):
                 return self._follow(node.value_ref)
         raise KeyError
 
+    def get_All_LTE(self, key):
+        "get all keys and values with keys less than or equal to passed key"
+        "Returns a list of Keys and a corresponding list of Values"
+        "Where all Keys are less than passed key"
+        "Calls recursive function follow_LTE to find such"
+
+        #if tree is not locked by another writer
+        #refresh the references and get new tree if needed
+        if not self._storage.locked:
+            self._refresh_tree_ref()
+
+        #get the top level node
+        node = self._follow(self._tree_ref)
+
+        #Initial Key and Val List set to empty
+        LTE_Keys = []
+        LTE_Vals = []
+
+        #Recursively find Keys and Values where Key is Less Than or Equal to key
+        LTE_Keys,LTE_Vals = self.follow_LTE(key, node, LTE_Keys,LTE_Vals)
+        return LTE_Keys,LTE_Vals
+
+    def follow_LTE(self, key, node, LTE_Keys,LTE_Vals):
+        "Recursive function to add Keys and Values"
+        "to lists, where Keys are less than or equal to key"
+        #If node is None, stop and return lists
+        if node is None:
+            return LTE_Keys,LTE_Vals
+        #If node's Key is <= key, add Key and Value to list
+        elif key >= node.key:
+            LTE_Keys.append(node.key)
+            LTE_Vals.append(self._follow(node.value_ref))
+            rightNode = self._follow(node.right_ref)
+            self.follow_LTE(key, rightNode, LTE_Keys,LTE_Vals)
+
+        #Always move left if current node is not None
+        leftNode = self._follow(node.left_ref)
+        self.follow_LTE(key, leftNode, LTE_Keys,LTE_Vals)
+
+        #After checking left and right nodes, return lists
+        return LTE_Keys,LTE_Vals
+
     def set(self, key, value):
         """Set a new value in the tree. Will cause a new tree"""
         # try to lock the tree. If we succeed make sure
@@ -472,7 +527,7 @@ class BinaryTree(object):
 
 
 def connect(dbname):
-    """Opens the database file (possibly creating it, 
+    """Opens the database file (possibly creating it,
     but never overwriting it) and returns an instance of DBDB"""
     try:
         f = open(dbname, 'r+b')

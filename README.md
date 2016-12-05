@@ -99,4 +99,16 @@ The time series library is organized into a tree hierarchy. All time series are 
 	print([pt for pt in sts.iteritems()])
 	>>> [(1478057746, 0), (1478057746, 1), (1478057746, 2), (1478057746, 3), (1478057746, 4), (1478057746, 5), (1478057746, 6), (1478057746, 7), (1478057746, 8), (1478057746, 9)]
 
+	# How To Run Util Functions
+	from timeseries.timeseries.util import *
+
+	# Gen 1000 TS
+	genTS()
+	# Gen 20 DB
+	genDB()
+	# Get Nearest TS
+	genSIM("website/tsdata/ts888.dat")
+	# Get 5 Nearest TS
+	genSIM_N("website/tsdata/ts888.dat")
+
 ```
