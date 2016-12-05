@@ -158,7 +158,7 @@ Functions Being Tested: interpolate and itertimes
 Summary: Interpolate and Itertimes Test
 '''
 def test_interpolate_itertimes():
-     
+
     a = TimeSeries([0,5,10], [1,2,3])
     b = TimeSeries([2.5,7.5], [100, -100])
     assert a.interpolate(b.itertimes()) == TimeSeries([2.5,7.5], [1.5, 2.5])
@@ -359,7 +359,7 @@ Summary: standard deviation
 def test_std():
     ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
     assert ts.std() == np.std([10, 11, 12, 13])
-    
+
 '''
 Functions Being Tested: mean
 Summary: mean
@@ -368,7 +368,7 @@ def test_mean():
     ts = TimeSeries([1,2,3,4], [10, 11, 12, 13])
     assert ts.mean() == np.mean([10, 11, 12, 13])
 
-    
+
 ### Start of ArrayTimeSeries Tests###
 
 '''
@@ -423,7 +423,7 @@ def test_setItem_ats():
     ats[2] = 5
     assert ats[2] == 5
 
-'''       
+'''
 Functions Being Tested: setitem
 Summary: setItem Index Error
 '''
@@ -446,7 +446,7 @@ def test_std():
 Summary: Interpolate and Itertimes Test
 '''
 def test_interpolate_itertimes_ats():
-     
+
     a = ArrayTimeSeries([0,5,10], [1,2,3])
     b = ArrayTimeSeries([2.5,7.5], [100, -100])
     assert a.interpolate(b.itertimes()) == ArrayTimeSeries([2.5,7.5], [1.5, 2.5])
@@ -488,7 +488,7 @@ def test_itertimes_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12, 13])
     sts = SimulatedTimeSeries(sts_gen)
     assert list(sts.itertimes()) == [1, 2, 3, 4]
-    
+
 '''
 Functions being tested: produce
 Summary: produce should return next value of the SimulatedTimeSeries if the input is a tuple
@@ -519,7 +519,7 @@ def test_produce_chunk_sts():
 
 '''
 Functions being tested: online_std
-Summary: produce should return 'chunk' values of the online_std SimulatedTimeSeries 
+Summary: produce should return 'chunk' values of the online_std SimulatedTimeSeries
 '''
 def test_std_chunk_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
@@ -529,7 +529,7 @@ def test_std_chunk_sts():
 
 '''
 Functions being tested: online_std
-Summary: produce should return next 'chunk' values of the online_std SimulatedTimeSeries 
+Summary: produce should return next 'chunk' values of the online_std SimulatedTimeSeries
 '''
 def test_std_successive_chunk_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
@@ -538,10 +538,10 @@ def test_std_successive_chunk_sts():
     sts_std_first = list(sts_std.produce(2))
     sts_std = sts.online_std(2)
     assert list(sts_std.produce(2)) == [(3, 0), (4, np.std([12, 13], ddof=1))]
-    
+
 '''
 Functions being tested: online_mean
-Summary: produce should return 'chunk' values of the online_mean SimulatedTimeSeries 
+Summary: produce should return 'chunk' values of the online_mean SimulatedTimeSeries
 '''
 def test_mean_chunk_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
@@ -551,7 +551,7 @@ def test_mean_chunk_sts():
 
 '''
 Functions being tested: online_mean
-Summary: produce should return next 'chunk' values of the online_mean SimulatedTimeSeries 
+Summary: produce should return next 'chunk' values of the online_mean SimulatedTimeSeries
 '''
 def test_mean_successive_chunk_sts():
     sts_gen = zip([1, 2, 3, 4], [10, 11, 12 ,13])
@@ -562,6 +562,71 @@ def test_mean_successive_chunk_sts():
     assert list(sts_mean.produce(2)) == [(3, 12), (4, np.mean([12, 13]))]
 
 
-    
 
+'''
+Functions Being Tested: stand
+Summary: Standard Deviation of the timeseries
+'''
+def test_stand():
+    ts1 = TimeSeries([1, 2, 3, 4], [100,101,102,103])
+    ts1_stand = stand(ts1, np.mean([100,101,102,103]), np.std([100,101,102,103]))
+    assert np.std(list(iter(ts1_stand))) == 1.0
 
+'''
+Functions Being Tested: max_corr_at_phase
+Summary: Correlation of a timeseries with itself
+'''
+def test_self_maxccor():
+    ts1 = TimeSeries([1, 2, 3, 4], [100,101,102,103])
+    assert max_corr_at_phase(ts1, ts1)[1] == 1.0
+
+'''
+Functions Being Tested: max_corr_at_phase
+Summary: Correlation of two shifted timeseries
+'''
+def test_maxccor():
+    ts1 = TimeSeries([1, 2, 3, 4, 5, 6, 7, 8, 9],[0, 1, 2, 3, 4, 3, 2, 1, 0])
+    ts2 = TimeSeries([1, 2, 3, 4, 5, 6, 7, 8, 9],[1, 2, 3, 4, 3, 2, 1, 0, 0])
+    assert abs(max_corr_at_phase(ts1, ts2)[1] - 1.0) < 1e-5
+
+'''
+Functions Being Tested: kernel_corr
+Summary: Correlation of two shifted timeseries using the exponential kernel
+'''
+def test_kernel_corr():
+    ts1 = TimeSeries([1, 2, 3, 4, 5, 6, 7, 8, 9],[0, 1, 2, 3, 4, 3, 2, 1, 0])
+    ts2 = TimeSeries([1, 2, 3, 4, 5, 6, 7, 8, 9],[1, 2, 3, 4, 3, 2, 1, 0, 0])
+    assert abs(kernel_corr(ts1, ts2, 10)-1) < 1e-3
+
+'''
+Functions Being Tested: tsmaker
+Summary: Basic Len Test
+'''
+def test_len_tsmaker():
+    t1 = tsmaker(0.5, 0.1, 0.01)
+    assert len(t1) == 100
+
+'''
+Functions Being Tested: random_ts
+Summary: Basic Len Test
+'''
+def test_len_random_ts():
+    t1 = random_ts(2)
+    assert len(t1) == 100
+
+'''
+Functions Being Tested: kernel_corr
+Summary: Basic kernel_corr
+'''
+def test_kernel_corr2():
+    t1 = random_ts(2)
+    assert kernel_corr(t1,t1) == 1
+
+'''
+Functions Being Tested: kernel_corr
+Summary: Basic kernel_corr
+'''
+def test_kernel_corr3():
+    t1 = random_ts(2)
+    t2 = random_ts(3)
+    assert kernel_corr(t1,t2) != 1

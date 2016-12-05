@@ -12,11 +12,11 @@ from .interfaces import *
 class TimeSeries(SizedContainerTimeSeriesInterface):
     def __init__(self, time_points, data_points):
         '''Implements the SizedContainerTimeSeriesInterface using Python lists for storage.
-            
+
             Args:
                 `time_points` (sequence): A sequence of time points. Must have length equal to `data_points.`
                 `data_points` (sequence): A sequence of data points. Must have length equal to `time_points.`
-            
+
             Returns:
                 TimeSeries: A time series containing time and data points.'''
 
@@ -30,7 +30,7 @@ class TimeSeries(SizedContainerTimeSeriesInterface):
            int: The number of elements in the time series.'''
 
         return len(self._times)
-    
+
     def __iter__(self):
         '''An iterable over the data points of the time series.
         Returns:
@@ -50,11 +50,11 @@ class ArrayTimeSeries(TimeSeries):
 
     def __init__(self, time_points, data_points):
         '''Implements the SizedContainerTimeSeriesInterface using NumPy arrays for storage.
-            
+
             Args:
                 `time_points` (sequence): A sequence of time points. Must have length equal to `data_points.`
                 `data_points` (sequence): A sequence of data points. Must have length equal to `time_points.`
-            
+
             Returns:
                 ArrayTimeSeries: A time series containing time and data points.'''
 
@@ -97,7 +97,7 @@ class ArrayTimeSeries(TimeSeries):
         return sys.getsizeof(self._times) + sys.getsizeof(self._data)
 
 class SimulatedTimeSeries(StreamTimeSeriesInterface):
-    '''A time series with no internal storage. 
+    '''A time series with no internal storage.
     Yields data from a supplied generator, either with or without times provided.'''
 
 
