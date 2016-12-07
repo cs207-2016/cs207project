@@ -72,7 +72,7 @@ def genDB(nTS = 1000, nDB = 20):
     	dbList[j].commit()
     	dbList[j].close()
 
-def genSIM(filename, nDB = 20):
+def genSIM1(filename, nDB = 20):
     '''
     Script3a: Find Nearest TS to TS passed in filename
     '''
@@ -126,12 +126,17 @@ def genSIM(filename, nDB = 20):
     nearest = sorted(distDict, key=distDict.__getitem__)[0]
     print("#### Nearest Timeseries ####")
     print(nearest)
+    m = re.search(r'tsdata/ts(\d+).',nearest)
+    return int(m.group(1))
+
+    '''
     file_path = 'website/results/results.txt'
     text_file = open(file_path, "w")
     text_file.write(nearest)
     text_file.close()
+    '''
 
-def genSIM_N(filename, nSim = 5, nDB = 20):
+def genSIM(filename, nSim = 5, nDB = 20):
     '''
     Script3b: Find N (nSim) Nearest TS to TS passed in filename
     '''

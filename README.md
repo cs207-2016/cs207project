@@ -102,13 +102,13 @@ The time series library is organized into a tree hierarchy. All time series are 
 	# How To Run Util Functions
 	from timeseries.timeseries.util import *
 
-	# Gen 1000 TS
+	# Generate 1000 Timeseries .dat Files in website/tsdata
 	genTS()
-	# Gen 20 DB
+	# Generate 20 Databases in website/tsdb
 	genDB()
-	# Get Nearest TS
+	# Get Nearest TS from 20 Databases in website/tsdb
+	genSIM1("website/tsdata/ts888.dat")
+	# Get 5 Nearest TS from 20 Databases in website/tsdb
 	genSIM("website/tsdata/ts888.dat")
-	# Get 5 Nearest TS
-	genSIM_N("website/tsdata/ts888.dat")
 
 ```
