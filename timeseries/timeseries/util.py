@@ -2,6 +2,7 @@ import os, sys
 import numpy.fft as nfft
 import numpy as np
 #below is your module. Use your ListTimeSeries or ArrayTimeSeries..
+import re
 from scipy.stats import norm
 from .timeseries import *
 from ..rbtree import *
@@ -184,11 +185,20 @@ def genSIM_N(filename, nSim = 5, nDB = 20):
     nearest = sorted(distDict, key=distDict.__getitem__)[:nSim]
     print("#### Nearest Timeseries ####")
     print(nearest)
+
+    '''
     file_path = 'website/results/results.txt'
     text_file = open(file_path, "w")
     for item in nearest:
         text_file.write("%s\n" % item)
     text_file.close()
+    '''
+
+    idList = []
+    for curr in nearest:
+        m = re.search(r'tsdata/ts(\d+).',curr)
+        idList.append(int(m.group(1)))
+    return idList
 
 
 def tsmaker(m, s, j):
