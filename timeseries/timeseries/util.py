@@ -2,6 +2,7 @@ import os, sys
 import numpy.fft as nfft
 import numpy as np
 #below is your module. Use your ListTimeSeries or ArrayTimeSeries..
+import re
 from scipy.stats import norm
 from .timeseries import *
 from ..rbtree import *
@@ -71,7 +72,7 @@ def genDB(nTS = 1000, nDB = 20):
     	dbList[j].commit()
     	dbList[j].close()
 
-def genSIM(filename, nDB = 20):
+def genSIM1(filename, nDB = 20):
     '''
     Script3a: Find Nearest TS to TS passed in filename
     '''
@@ -125,12 +126,17 @@ def genSIM(filename, nDB = 20):
     nearest = sorted(distDict, key=distDict.__getitem__)[0]
     print("#### Nearest Timeseries ####")
     print(nearest)
+    m = re.search(r'tsdata/ts(\d+).',nearest)
+    return int(m.group(1))
+
+    '''
     file_path = 'website/results/results.txt'
     text_file = open(file_path, "w")
     text_file.write(nearest)
     text_file.close()
+    '''
 
-def genSIM_N(filename, nSim = 5, nDB = 20):
+def genSIM(filename, nSim = 5, nDB = 20):
     '''
     Script3b: Find N (nSim) Nearest TS to TS passed in filename
     '''
@@ -184,11 +190,20 @@ def genSIM_N(filename, nSim = 5, nDB = 20):
     nearest = sorted(distDict, key=distDict.__getitem__)[:nSim]
     print("#### Nearest Timeseries ####")
     print(nearest)
+
+    '''
     file_path = 'website/results/results.txt'
     text_file = open(file_path, "w")
     for item in nearest:
         text_file.write("%s\n" % item)
     text_file.close()
+    '''
+
+    idList = []
+    for curr in nearest:
+        m = re.search(r'tsdata/ts(\d+).',curr)
+        idList.append(int(m.group(1)))
+    return idList
 
 
 def tsmaker(m, s, j):
