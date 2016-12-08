@@ -4,6 +4,8 @@ import threading
 from .tsdb_ops import *
 from .tsdb_deserialize import *
 from .tsdb_error import *
+from rbtree import DBDB
+from timeseries.util import genSIM
 import json
 import enum
 
@@ -11,8 +13,7 @@ LENGTH_FIELD_LENGTH = 4
 
 class TSDB_Server(socketserver.BaseServer):
 
-    def __init__(self, db, addr=15000):
-        self.db = db
+    def __init__(self, addr=15000):
         self.addr = port
         self.deserializer = Deserializer()
 
@@ -26,7 +27,7 @@ class TSDB_Server(socketserver.BaseServer):
         while True:
             print('connection')
             client_sock, client_addr = sock.accept()
-            pool.submit(handle_client, client_sock, client_addr, self.db)
+            pool.submit(handle_client, client_sock, client_addr)
 
     def handle_client(sock, client_addr):
         print('Got connection from', client_addr)
@@ -49,6 +50,7 @@ class TSDB_Server(socketserver.BaseServer):
                 tsdbop = TSDBOp.from_json(msg)
             except TypeError as e:
                 response = TSDBOp_Return(TSDBStatus.INVALID_OPERATION, None)
+
             if status is TSDBStatus.OK:
                 if isinstance(op, TSDBOp_withTS):
                     response = self._with_ts(tsdbop)
@@ -60,9 +62,17 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
-
-        return None
+        ids = genSIM(TSDBOp['ts'])
+        return TSDBOp_Return(TSDBStatus.OK, ids)
 
     def _with_id(self, TSDBOp):
+        ids = genSIM(TSDBOp['id'])
+        return TSDBOp_Return(TSDBStatus.OK, ids)
 
-        return None
+    # def get_file_from_id(self, idee):
+    #     ts = SMTimeSeries.from_db(idee)
+    #     return ts
+
+def __main__():
+    server = TSDB_Server()
+    server.run()
