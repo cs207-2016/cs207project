@@ -3,5 +3,12 @@ sdist:
 	$(MAKE) -C ./src/rbtree sdist
 
 test:
-	PYTEST_ADDOPTS=' --cov-report term-missing'
+	export PYTEST_ADDOPTS=' --cov-report term-missing'
 	py.test
+
+install:
+	$(MAKE) sdist
+	pip install ./dist/*.tar.gz
+
+uninstall:
+	pip uninstall rbtree timeseries
