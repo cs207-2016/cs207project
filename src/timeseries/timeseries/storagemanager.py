@@ -3,8 +3,8 @@ import numpy as np
 import os, os.path
 import sys
 
-from ..timeseries.interfaces import SizedContainerTimeSeriesInterface
-from ..timeseries.timeseries import ArrayTimeSeries
+from .interfaces import SizedContainerTimeSeriesInterface
+from .timeseries import ArrayTimeSeries
 
 class StorageManagerInterface(abc.ABC):
     '''An interface for managing persistent storage of time series under an identifier.'''
