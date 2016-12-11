@@ -25,7 +25,7 @@ from sys import getsizeof
 from operator import neg, sub, add
 from itertools import combinations as combos
 
-from .context import *
+from context import *
 
 '''
 Functions being tested: store

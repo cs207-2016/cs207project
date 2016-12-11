@@ -1,36 +1,25 @@
 import os, sys
 import numpy.fft as nfft
 import numpy as np
-#below is your module. Use your ListTimeSeries or ArrayTimeSeries..
 import re
 from scipy.stats import norm
-from .timeseries import *
-from ..rbtree import *
 
+from timeseries import *
+from rbtree import *
 
-'''
-
-Util Functions for Similarity Search Between Timeseries
-
-'''
-
-
-def genTS(nTS = 1000):
-    '''
-    Script1: Generate 1000 TS in website/tsdata folder
-    '''
+'''Util Functions for Similarity Search Between Timeseries'''
+def genTS(nTS = 1000, file_dir='./tsdata'):
+    '''Script1: Generate 1000 TS in website/tsdata folder'''
     for i in range(nTS):
-        file_path = 'website/tsdata/ts'+str(i)+'.dat'
+        file_path = file_dir + '/ts'+str(i)+'.dat'
         fp = open(file_path,'w+')
         m = np.random.random()
         s = np.random.random()
         t1 = tsmaker(m, s, 0.01)
         np.savetxt(file_path,np.transpose(np.array([list(t1.itertimes()),list(t1)])), delimiter=' ')
 
-def genDB(nTS = 1000, nDB = 20):
-    '''
-    Script2: Generate 20 databases in website/tsdb
-    '''
+def genDB(nTS = 1000, nDB = 20, file_dir='./tsdb'):
+    '''Script2: Generate 20 databases in website/tsdb'''
     indexes = np.random.choice(nTS,nDB, replace = False)
     print("### Vantage Indx Pts ###")
     print(indexes)

@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+../../dist/timeseries.egg-info/SOURCES.txt
+timeseries/__init__.py
+timeseries/helpers.py
+timeseries/interfaces.py
+timeseries/smtimeseries.py
+timeseries/storagemanager.py
+timeseries/timeseries.py

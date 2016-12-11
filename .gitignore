@@ -3,16 +3,14 @@
 *.coverage
 *.cache
 *.~
-timeseries/#timeseries.py#
-timeseries/.#timeseries.py                               
-timeseries/smdata
 tests/tsdb
 tests/tsfiles
-
 tsbtreedb/tsfiles/*
 tsbtreedb/tsdb/*
 *.dat
 *.dbdb
+
+src/dist
 
 #Virtualenv
 bin

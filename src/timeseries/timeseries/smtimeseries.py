@@ -2,7 +2,7 @@
 
 from .helpers import *
 from .interfaces import *
-from ..storagemanager import *
+from .storagemanager import *
 
 class SMTimeSeries(SizedContainerTimeSeriesInterface):
     
