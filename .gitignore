@@ -11,8 +11,10 @@ tsbtreedb/tsdb/*
 *.dbdb
 
 src/dist
+src/*.egg-info
 
 #Virtualenv
 bin
 lib
 include
+
