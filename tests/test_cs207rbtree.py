@@ -29,7 +29,7 @@ import math
 import datetime
 import os
 
-from .context import *
+from context import *
 
 '''
 Functions Being Tested: Get

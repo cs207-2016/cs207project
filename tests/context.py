@@ -1,10 +1,13 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+path = os.path.join(path, 'src')
+sys.path.insert(0, path)
 
 from timeseries.timeseries import *
-from timeseries.rbtree import *
-from timeseries.storagemanager import *
+from rbtree.rbtree import *
+from dbserver.dbserver.util import *
 
 # Alias for group 5 tests
-from timeseries import group5code as tsbtreedb
+import group5code as tsbtreedb

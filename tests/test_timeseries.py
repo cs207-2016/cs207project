@@ -26,7 +26,7 @@ import random
 import math
 import datetime
 
-from .context import *
+from context import *
 
 '''
 Functions Being Tested: Len
@@ -42,7 +42,7 @@ Summary: Basic Repr Test
 '''
 def test_repr():
     ts = TimeSeries([1,2,3,4],[100,101,102,103])
-    assert repr(ts) == '<timeseries.timeseries.timeseries.TimeSeries object at %s>TimeSeries([[1,100]\n[2,101]\n[3,102]\n[4,103]\n])' % hex(id(ts))
+    assert repr(ts) == '<timeseries.timeseries.TimeSeries object at %s>TimeSeries([[1,100]\n[2,101]\n[3,102]\n[4,103]\n])' % hex(id(ts))
 
 '''
 Functions Being Tested: Init
