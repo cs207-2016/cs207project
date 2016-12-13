@@ -9,6 +9,3 @@ test:
 install:
 	$(MAKE) sdist
 	pip install ./dist/*.tar.gz
-
-uninstall:
-	pip uninstall rbtree timeseries

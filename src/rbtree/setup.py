@@ -10,7 +10,7 @@ with open('LICENSE') as f:
 setup(
     name='rbtree',
     version='0.1',
-    scripts=['rbtree.py'],
+    packages=['rbtree'],
     author='Sophie Hilgard;Ryan Lapcevic;Anthony Soroka;Yamini Bansal; Ariel Herbet-Voss',
     author_email='rlapcevic@g.harvard.edu',
     url='',
