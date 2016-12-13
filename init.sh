@@ -6,7 +6,7 @@ fi
 # Fetch dependencies
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install python3 python3-pip pyton3-psyopg2 postgresql postgresql-contrib apache2
+sudo apt-get install python3 python3-pip pyton3-psyopg2 postgresql postgresql-contrib apache2 libapache2-mod-wsgi
 sudo pip3 install flask Flask_SQLAlchemy
 
 # Install our libraries
@@ -29,3 +29,8 @@ sudo -u postgres bash -c "createdb -w -O cs207site timeseries"
 sudo systemctl enable postgresql.service
 sudo systemctl start postgresql.service
 
+# Initialize apache server
+sudo a2enmod wsgi
+sudo cp src/website/cs207site.conf /etc/apache2/sites-available
+sudo cp -r /src/website /var/www/cs207site
+sudo a2ensite cs207site.conf
