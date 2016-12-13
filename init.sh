@@ -21,7 +21,11 @@ sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
 sudo systemctl daemon-reload
 sudo systemctl enable dbserver.service
+sudo systemctl start dbserver.service
 
 # Initialize postgres server
+sudo -u postgres bash -c "psql -c \"CREATE USER cs207site WITH PASSWORD 'cs207isthebest';\""
+sudo createdb -U cs207site -W cs207isthebest timeseries
 sudo systemctl enable postgresql.service
+sudo systemctl start postgresql.service
 
