@@ -77,7 +77,7 @@ class TSDB_Server(socketserver.BaseServer):
         ids = genSIM(TSDBOp['id'])
         tslist = [get_file_from_id(idee) for idee in ids]
         tsdump = pickle.dumps(tslist)
-        return TSDBOp_Return(TSDBStatus.OK, tslist)
+        return TSDBOp_Return(TSDBStatus.OK, tsdump)
 
     def get_file_from_id(self, idee):
         ts = SMTimeSeries.from_db(idee, self.sm)
