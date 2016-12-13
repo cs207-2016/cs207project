@@ -7,9 +7,9 @@ fi
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install python3 python3-pip postgresql postgresql-contrib apache2 libapache2-mod-wsgi make
-sudo pip3 install flask Flask_SQLAlchemy easy_install setuptools 
+sudo pip3 install flask Flask_SQLAlchemy easy_install setuptools pytest
 
-# Install our libraries
+# Build and install our libraries
 make sdist
 sudo pip3 install ./dist/timeseries*.tar.gz ./dist/rbtree*.tar.gz ./dist/dbserver*.tar.gz
 
