@@ -86,7 +86,7 @@ def get_all_metadata():
                 filter(TimeseriesEntry.blarg < upper)
         elif 'level_in' in request.args:
             logger.debug("Getting entries by level value")
-            levels = request.args.get('mean_in').split(",")
+            levels = request.args.get('level_in').split(",")
             results = db.session.query(TimeseriesEntry). \
                 filter(TimeseriesEntry.level.in_(levels))
         elif 'mean_in' in request.args:
@@ -104,8 +104,8 @@ def get_all_metadata():
         else:
             logger.info("Getting all TimeseriesEntries")
             results = db.session.query(TimeseriesEntry).all()
-        return jsonify(dict(timeseries=results))
-    except KeyError as e:
+        return jsonify(dict(timeseries=[x.to_dict() for x in results]))
+    except (KeyError, ValueError) as e:
         logger.warning("Invalid timeseries GET request: %s" % str(e))
         abort(400)
 
@@ -267,6 +267,10 @@ def root():
 @app.route('/main.js')
 def main_js():
     return app.send_static_file('main.js')
+
+@app.route('/main.css')
+def main_css():
+    return app.send_static_file('main.css')
 
 @app.errorhandler(404)
 def not_found(error):
