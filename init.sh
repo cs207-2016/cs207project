@@ -25,7 +25,7 @@ sudo systemctl start dbserver.service
 
 # Initialize postgres server
 sudo -u postgres bash -c "psql -c \"CREATE USER cs207site WITH PASSWORD 'cs207isthebest';\""
-sudo createdb -U cs207site -W cs207isthebest timeseries
+sudo -u postgres bash -c "createdb -w -O cs207site timeseries"
 sudo systemctl enable postgresql.service
 sudo systemctl start postgresql.service
 
