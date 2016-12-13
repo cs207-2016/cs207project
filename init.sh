@@ -6,8 +6,8 @@ fi
 # Fetch dependencies
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install python3 python3-pip pyton3-psyopg2 postgresql postgresql-contrib apache2 libapache2-mod-wsgi
-sudo pip3 install flask Flask_SQLAlchemy
+sudo apt-get install python3 python3-pip python3-psyopg2 postgresql postgresql-contrib apache2 libapache2-mod-wsgi make
+sudo pip3 install flask Flask_SQLAlchemy easy_install setuptools 
 
 # Install our libraries
 make sdist
