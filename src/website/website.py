@@ -171,30 +171,85 @@ def create_entry():
     prod = TimeseriesEntry(blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
     db.session.add(prod)
     db.session.commit()
-    return jsonify({'op': 'OK', 'task': prod}), 201
+    result = {
+        "time_points" : request.json["time_points"],
+        "data_points" : request.json["data_points"],
+        "mean" : mean,
+        "std" : std,
+        "blarg" : blarg,
+        "level" : level
+    }
+    return jsonify(result), 201
 
 @app.route('/timeseries/<int:timeseries_id>', methods=['GET'])
 def get_timeseries_by_id(timeseries_id):
-    ts = TimeseriesEntry.query.filter_by(id=timeseries_id).first()
-    if ts is None:
-        logger.info('Failed to get TimeseriesEntry with id=%s', timeseries_id)
+    """/timeseries/id GET endpoint
+        Defines the following API call:
+            * /timeseries/id GET - Return the timeseries and associated metadata as a JSON object
+    """
+    te = db.session.query(TimeseriesEntry).filter_by(id=timeseries_id).first()
+    if te is None:
+        logger.warning('Failed to get TimeseriesEntry with id=%s', timeseries_id)
         abort(404)
-    logger.info('Getting TimeseriesEntry with id=%s', timeseries_id)
-    return jsonify({'task': ts})
+        return
+    logger.debug('Getting TimeseriesEntry with id=%s', timeseries_id)
+    ts = load_timeseries_from_file(te.fpath)
+    time_points, data_points = zip(*ts.iteritems())
+    result = {
+        "time_points": time_points,
+        "data_points": data_points,
+        "mean": te.mean,
+        "std": te.std,
+        "blarg": te.blarg,
+        "level": te.level
+    }
+    return jsonify(result)
 
 @app.route('/simquery', methods=['GET'])
 def get_simquery():
-    if 'id' in request.args:
-        id = request.args.get('id')
-        # run the similarity search
-    else:
+    """/simquery GET endpoint
+        Defines the following API call:
+            * /simquery/id=x - GET - Returns the top 5 most similar timeseries to the entry indicated by id as
+                {
+                    similar_ids = [list of 5 ids]
+                }
+    """
+    if 'id' not in request.args:
+        logger.warning("ID is required for similarity search")
         abort(400)
+    timeseries_id = request.args.get('id')
+    te = db.session.query(TimeseriesEntry).filter_by(id=timeseries_id).first()
+    if te is None:
+        logger.warning('Failed to get TimeseriesEntry with id=%s', timeseries_id)
+        abort(404)
+        return
+    ts = load_timeseries_from_file(te.fpath)
+    # NOTE: PLEASE ADD SIMILARITY SEARCH
+    sim_ids = [random.randint(0,10) for _ in range(5)] # REPLACE THIS
+    return jsonify({"similar_ids" : sim_ids})
 
 @app.route('/simquery', methods=['POST'])
 def post_simquery():
-    if not request.json:
+    """/simquery POST endpoint
+        Defines the following API call:
+            * /simquery - POST - Get similar timeseries to a given timeseries without adding to database. Returns:
+                {
+                    similar_ids = [list of 5 ids]
+                }
+    """
+    if not request.json or not "time_points" in request.json or not "data_points" in request.json:
+        logger.warning("Invalid POST request to simquery")
         abort(400)
-    # handle post
+        return
+    try:
+        ts = generate_timeseries_from_json(request.json) # Create actual timeseries object
+    except Exception as e:
+        logger.warning("Could not create timeseries object with exception: %s" % str(e))
+        abort(400)
+        return
+    # NOTE: PLEASE ADD SIMILARITY SEARCH
+    sim_ids = [random.randint(0,10) for _ in range(5)] # REPLACE THIS
+    return jsonify({"similar_ids" : sim_ids})
 
 @app.errorhandler(404)
 def not_found(error):
