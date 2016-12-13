@@ -1,9 +1,9 @@
 from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
 from concurrent.futures import ThreadPoolExecutor
 import threading
-from tsdb_ops import *
-from tsdb_deserialize import *
-from tsdb_error import *
+from .tsdb_ops import *
+from .tsdb_deserialize import *
+from .tsdb_error import *
 from rbtree import DBDB
 from util import genSIM
 import json
