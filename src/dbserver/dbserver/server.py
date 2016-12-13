@@ -43,7 +43,7 @@ class TSDB_Server(socketserver.BaseServer):
         while True:
             print('connection')
             client_sock, client_addr = sock.accept()
-            pool.submit(handle_client, client_sock, client_addr)
+            pool.submit(self.handle_client, client_sock, client_addr)
 
     def data_received(self, data):
         self.deserializer.append(data)
