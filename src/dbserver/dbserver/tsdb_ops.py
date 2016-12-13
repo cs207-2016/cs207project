@@ -1,6 +1,6 @@
 import timeseries as ts
 #you will have to come up with an error handling system
-from .tsdb_error import *
+from tsdb_error import *
 
 
 # Interface classes for TSDB network operations.
