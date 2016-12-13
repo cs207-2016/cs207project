@@ -34,3 +34,5 @@ sudo a2enmod wsgi
 sudo cp src/website/cs207site.conf /etc/apache2/sites-available
 sudo cp -r src/website /var/www/cs207site
 sudo a2ensite cs207site.conf
+sudo service apache2 reload
+
