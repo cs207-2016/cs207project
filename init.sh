@@ -18,6 +18,7 @@ sudo useradd -r -s /bin/false dbserver
 sudo mkdir /var/dbserver
 sudo chown /var/dbserver dbserver:dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
+sudo cp src/dbserver/start_dbserver.py /var/dbserver
 sudo systemctl daemon-reload
 sudo systemctl enable dbserver.service
 
