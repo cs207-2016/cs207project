@@ -17,7 +17,7 @@ class ProductJSONEncoder(json.JSONEncoder):
         return super(ProductJSONEncoder, self).default(obj)
 
 
-app = Flask(__name__)  # Create an instance of the Flask web server
+app = Flask(__name__, static_url_path='/static')  # Create an instance of the Flask web server
 app.json_encoder = ProductJSONEncoder
 
 user = 'cs207site'
@@ -260,6 +260,13 @@ def post_simquery():
     sim_ids = [random.randint(0, 10) for _ in range(5)]  # REPLACE THIS
     return jsonify({"similar_ids": sim_ids})
 
+@app.route('/')
+def root():
+    return app.send_static_file('index.html')
+
+@app.route('/main.js')
+def main_js():
+    return app.send_static_file('main.js')
 
 @app.errorhandler(404)
 def not_found(error):
