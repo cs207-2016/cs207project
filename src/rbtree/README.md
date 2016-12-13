@@ -1,3 +1,3 @@
-# CS207 Team 3 Time Series Library
+# CS207 Team 3 Red-Black Tree Library
 
-# TODO: Someone write this
+# Todo: Implementation details and examples

@@ -17,8 +17,7 @@ class ProductJSONEncoder(JSONEncoder):
 app = Flask(__name__) # Create an instance of the Flask web server
 app.json_encoder = ProductJSONEncoder
 
-# Set up PostGres database
-user = 'postgress'
+user = 'cs207site'
 password = 'cs207isthebest'
 host = 'localhost'
 port = '5432'
