@@ -4,8 +4,7 @@ import threading
 from .tsdb_ops import *
 from .tsdb_deserialize import *
 from .tsdb_error import *
-from rbtree import DBDB
-from util import genSIM
+from .util import genSIM
 from timeseries.storagemanager import FileStorageManager
 import json
 import enum
@@ -82,9 +81,3 @@ class TSDB_Server(socketserver.BaseServer):
     def get_file_from_id(self, idee):
         ts = SMTimeSeries.from_db(idee, self.sm)
         return ts
-
-def __main__():
-    server = TSDB_Server()
-    server.run()
-
-__main__()
