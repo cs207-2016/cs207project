@@ -17,7 +17,7 @@ class ProductJSONEncoder(json.JSONEncoder):
         return super(ProductJSONEncoder, self).default(obj)
 
 
-app = Flask(__name__) # Create an instance of the Flask web server
+app = Flask(__name__)  # Create an instance of the Flask web server
 app.json_encoder = ProductJSONEncoder
 
 user = 'cs207site'
@@ -56,6 +56,7 @@ class TimeseriesEntry(db.Model):
     def to_dict(self):
         return dict(id=self.id, blarg=self.blarg, level=self.level, mean=self.mean, std=self.std, fpath=self.fpath)
 
+
 def get_floating_range(range_str):
     if "-" not in range_str:
         raise KeyError("Invalid input range: %s" % range_str)
@@ -63,6 +64,7 @@ def get_floating_range(range_str):
     if len(range_components) != 2:
         raise KeyError("Found too many range indications in: %s" % range_str)
     return float(range_components[0]), float(range_components[1])
+
 
 @app.route('/timeseries', methods=['GET'])
 def get_all_metadata():
@@ -79,25 +81,25 @@ def get_all_metadata():
         if 'blarg_in' in request.args:
             logger.debug("Getting entries by blarg value")
             lower, upper = get_floating_range(request.args.get('blarg_in'))
-            results = db.session.query(TimeseriesEntry).\
-                filter(TimeseriesEntry.blarg >= lower).\
+            results = db.session.query(TimeseriesEntry). \
+                filter(TimeseriesEntry.blarg >= lower). \
                 filter(TimeseriesEntry.blarg < upper)
         elif 'level_in' in request.args:
             logger.debug("Getting entries by level value")
             levels = request.args.get('mean_in').split(",")
-            results = db.session.query(TimeseriesEntry).\
+            results = db.session.query(TimeseriesEntry). \
                 filter(TimeseriesEntry.level.in_(levels))
         elif 'mean_in' in request.args:
             logger.debug("Getting entries by mean value")
             lower, upper = get_floating_range(request.args.get('mean_in'))
-            results = db.session.query(TimeseriesEntry).\
-                filter(TimeseriesEntry.mean >= lower).\
+            results = db.session.query(TimeseriesEntry). \
+                filter(TimeseriesEntry.mean >= lower). \
                 filter(TimeseriesEntry.mean < upper)
         elif 'std_in' in request.args:
             logger.debug("Getting entries by std value")
             lower, upper = get_floating_range(request.args.get('std_in'))
-            results = db.session.query(TimeseriesEntry).\
-                filter(TimeseriesEntry.std >= lower).\
+            results = db.session.query(TimeseriesEntry). \
+                filter(TimeseriesEntry.std >= lower). \
                 filter(TimeseriesEntry.std < upper)
         else:
             logger.info("Getting all TimeseriesEntries")
@@ -106,6 +108,7 @@ def get_all_metadata():
     except KeyError as e:
         logger.warning("Invalid timeseries GET request: %s" % str(e))
         abort(400)
+
 
 def generate_timeseries_from_json(raw_json):
     """Return an ArrayTimeSeries object containing the data in a json file with the following format:
@@ -118,25 +121,28 @@ def generate_timeseries_from_json(raw_json):
     data_points = [float(x) for x in raw_json["data_points"]]
     return timeseries.ArrayTimeSeries(time_points, data_points)
 
+
 def save_timeseries_to_file(ts):
     """Saves an ArrayTimeSeries to a local file in the results folder.
         Each file is given a random name to prevent file conflicts.
         Note: This system needs to be replaced by the storage manager"""
-    filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))+".json"
+    filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20)) + ".json"
     time_points, data_points = zip(*ts.iteritems())
     data = {
-        "time_points" : time_points,
-        "data_points" : data_points
+        "time_points": time_points,
+        "data_points": data_points
     }
     with open(filename, "w") as f:
         json.dump(data, f)
     return filename
+
 
 def load_timeseries_from_file(filename):
     """Loads an ArrayTimeSeries from a local file"""
     with open(filename, "r") as f:
         data = json.load(f)
     return generate_timeseries_from_json(data)
+
 
 @app.route('/timeseries', methods=['POST'])
 def create_entry():
@@ -154,15 +160,15 @@ def create_entry():
         return
     logger.debug('Creating TimeseriesEntry')
     try:
-        ts = generate_timeseries_from_json(request.json) # Create actual timeseries object
+        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
         abort(400)
         return
-    mean = ts.mean() # Get mean and standard deviation from object
+    mean = ts.mean()  # Get mean and standard deviation from object
     std = ts.std()
     blarg = random.random()
-    level = random.choice(["A","B","C","D","E","F"])
+    level = random.choice(["A", "B", "C", "D", "E", "F"])
 
     # Save to file and get fpath (replace with storage manager)
     fpath = save_timeseries_to_file(ts)
@@ -172,14 +178,15 @@ def create_entry():
     db.session.add(prod)
     db.session.commit()
     result = {
-        "time_points" : request.json["time_points"],
-        "data_points" : request.json["data_points"],
-        "mean" : mean,
-        "std" : std,
-        "blarg" : blarg,
-        "level" : level
+        "time_points": request.json["time_points"],
+        "data_points": request.json["data_points"],
+        "mean": mean,
+        "std": std,
+        "blarg": blarg,
+        "level": level
     }
     return jsonify(result), 201
+
 
 @app.route('/timeseries/<int:timeseries_id>', methods=['GET'])
 def get_timeseries_by_id(timeseries_id):
@@ -205,6 +212,7 @@ def get_timeseries_by_id(timeseries_id):
     }
     return jsonify(result)
 
+
 @app.route('/simquery', methods=['GET'])
 def get_simquery():
     """/simquery GET endpoint
@@ -225,8 +233,9 @@ def get_simquery():
         return
     ts = load_timeseries_from_file(te.fpath)
     # NOTE: PLEASE ADD SIMILARITY SEARCH
-    sim_ids = [random.randint(0,10) for _ in range(5)] # REPLACE THIS
-    return jsonify({"similar_ids" : sim_ids})
+    sim_ids = [random.randint(0, 10) for _ in range(5)]  # REPLACE THIS
+    return jsonify({"similar_ids": sim_ids})
+
 
 @app.route('/simquery', methods=['POST'])
 def post_simquery():
@@ -242,14 +251,15 @@ def post_simquery():
         abort(400)
         return
     try:
-        ts = generate_timeseries_from_json(request.json) # Create actual timeseries object
+        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
         abort(400)
         return
     # NOTE: PLEASE ADD SIMILARITY SEARCH
-    sim_ids = [random.randint(0,10) for _ in range(5)] # REPLACE THIS
-    return jsonify({"similar_ids" : sim_ids})
+    sim_ids = [random.randint(0, 10) for _ in range(5)]  # REPLACE THIS
+    return jsonify({"similar_ids": sim_ids})
+
 
 @app.errorhandler(404)
 def not_found(error):
