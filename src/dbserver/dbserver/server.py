@@ -4,19 +4,23 @@ import threading
 from .tsdb_ops import *
 from .tsdb_deserialize import *
 from .tsdb_error import *
-from rbtree import DBDB
-from util import genSIM
+from .util import genSIM
+from timeseries.storagemanager import FileStorageManager
 import json
 import enum
 import socketserver
+import pickle
 
 LENGTH_FIELD_LENGTH = 4
+DBSERVER_HOME = '/var/dbserver/'
+TIMESERIES_DIR = 'tsdata'
 
 class TSDB_Server(socketserver.BaseServer):
 
     def __init__(self, addr=15001):
         self.addr = addr
         self.deserializer = Deserializer()
+        self.sm = FileStorageManager(DBSERVER_HOME+TIMESERIES_DIR)
 
     def handle_client(sock, client_addr):
         print('Got connection from', client_addr)
@@ -64,18 +68,16 @@ class TSDB_Server(socketserver.BaseServer):
 
     def _with_ts(self, TSDBOp):
         ids = genSIM(TSDBOp['ts'])
-        return TSDBOp_Return(TSDBStatus.OK, ids)
+        tslist = [get_file_from_id(idee) for idee in ids]
+        tsdump = pickle.dumps(tslist)
+        return TSDBOp_Return(TSDBStatus.OK, tsdump)
 
     def _with_id(self, TSDBOp):
         ids = genSIM(TSDBOp['id'])
-        return TSDBOp_Return(TSDBStatus.OK, ids)
+        tslist = [get_file_from_id(idee) for idee in ids]
+        tsdump = pickle.dumps(tslist)
+        return TSDBOp_Return(TSDBStatus.OK, tsdump)
 
-    # def get_file_from_id(self, idee):
-    #     ts = SMTimeSeries.from_db(idee)
-    #     return ts
-
-def __main__():
-    server = TSDB_Server()
-    server.run()
-
-__main__()
+    def get_file_from_id(self, idee):
+        ts = SMTimeSeries.from_db(idee, self.sm)
+        return ts
