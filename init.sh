@@ -16,7 +16,7 @@ sudo pip install ./dist/timeseries*.tar.gz ./dist/rbtree*.tar.gz ./dist/dbserver
 # Initialize time series database server
 sudo useradd -r -s /bin/false dbserver
 sudo mkdir /var/dbserver
-sudo chown /var/dbserver dbserver:dbserver
+sudo chown dbserver:dbserver /var/dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
 sudo systemctl daemon-reload
