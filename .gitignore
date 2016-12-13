@@ -9,7 +9,7 @@ tsbtreedb/tsfiles/*
 tsbtreedb/tsdb/*
 *.dat
 *.dbdb
-
+dist/*
 src/dist
 src/*.egg-info
 

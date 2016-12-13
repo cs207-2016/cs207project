@@ -1,0 +1,21 @@
+[Unit]
+Description=Socket Server for Time Series Data
+After=syslog.target
+
+[Service]
+Type=simple
+User=dbserver
+Group=dbserver
+WorkingDirectory=/var/dbserver/
+ExecStart=/usr/bin/python3 /var/dbserver/start_dbserver.py
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
+

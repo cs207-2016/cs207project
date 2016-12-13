@@ -18,7 +18,7 @@ def genTS(nTS = 1000, file_dir='./tsdata'):
         t1 = tsmaker(m, s, 0.01)
         np.savetxt(file_path,np.transpose(np.array([list(t1.itertimes()),list(t1)])), delimiter=' ')
 
-def genDB(nTS = 1000, nDB = 20, file_dir='./tsdb'):
+def genDB(nTS = 1000, nDB = 20, tsdata_dir='./tsdata', db_dir='./tsdb'):
     '''Script2: Generate 20 databases in website/tsdb'''
     indexes = np.random.choice(nTS,nDB, replace = False)
     print("### Vantage Indx Pts ###")
@@ -29,8 +29,8 @@ def genDB(nTS = 1000, nDB = 20, file_dir='./tsdb'):
     #Create TS Referencing
     #The nDB randomally selected vantagePtFiles
     for j in range(nDB):
-    	fileName = 'website/tsdata/ts'+str(indexes[j])+'.dat'
-    	dbName = "website/tsdb/db"+str(j)+".dbdb"
+    	fileName = tsdata_dir + '/ts'+str(indexes[j])+'.dat'
+    	dbName = db_dir + "/db"+str(j)+".dbdb"
     	x = np.loadtxt(fileName, delimiter=' ')
     	vantagePt = TimeSeries(x[:,0],x[:,1])
     	vantagePtList.append(vantagePt)
@@ -47,7 +47,7 @@ def genDB(nTS = 1000, nDB = 20, file_dir='./tsdb'):
     #Add Key = Distance(vantagePt, comparePt)
     #Value = comparePT's fileName
     for i in range(nTS):
-    	fileName = 'website/tsdata/ts'+str(i)+'.dat'
+    	fileName = tsdata_dir + '/ts'+str(i)+'.dat'
     	x = np.loadtxt(fileName, delimiter=' ')
     	comparePt = TimeSeries(x[:,0],x[:,1])
 
@@ -61,7 +61,7 @@ def genDB(nTS = 1000, nDB = 20, file_dir='./tsdb'):
     	dbList[j].commit()
     	dbList[j].close()
 
-def genSIM1(filename, nDB = 20):
+def genSIM1(filename, nDB = 20, tsdata_dir='./tsdata',tsdb_dir='./tsdb'):
     '''
     Script3a: Find Nearest TS to TS passed in filename
     '''
@@ -74,7 +74,7 @@ def genSIM1(filename, nDB = 20):
     # Find the Nearest vantagePt
     minDist = float('inf')
     for j in range(nDB):
-        dbName = "website/tsdb/db"+str(j)+".dbdb"
+        dbName = tsdb_dir + "/db"+str(j)+".dbdb"
         db = connect(dbName)
         vantagePtFile = db.get(0)
         x = np.loadtxt(vantagePtFile, delimiter=' ')
@@ -115,7 +115,7 @@ def genSIM1(filename, nDB = 20):
     nearest = sorted(distDict, key=distDict.__getitem__)[0]
     print("#### Nearest Timeseries ####")
     print(nearest)
-    m = re.search(r'tsdata/ts(\d+).',nearest)
+    m = re.search(r'{}/ts(\d+).'.format(tsdata_dir),nearest)
     return int(m.group(1))
 
     '''
@@ -125,7 +125,7 @@ def genSIM1(filename, nDB = 20):
     text_file.close()
     '''
 
-def genSIM(filename, nSim = 5, nDB = 20):
+def genSIM(filename, nSim = 5, nDB = 20, tsdata_dir='./tsdata', tsdb_dir='./tsdb'):
     '''
     Script3b: Find N (nSim) Nearest TS to TS passed in filename
     '''
@@ -143,7 +143,7 @@ def genSIM(filename, nSim = 5, nDB = 20):
 
     # Find the Nearest vantagePt
     for j in range(nDB):
-        dbName = "website/tsdb/db"+str(j)+".dbdb"
+        dbName = tsdb_dir + "/db"+str(j)+".dbdb"
         db = connect(dbName)
         vantagePtFile = db.get(0)
         x = np.loadtxt(vantagePtFile, delimiter=' ')
@@ -190,7 +190,7 @@ def genSIM(filename, nSim = 5, nDB = 20):
 
     idList = []
     for curr in nearest:
-        m = re.search(r'tsdata/ts(\d+).',curr)
+        m = re.search(r'{}/ts(\d+).'.format(tsdata_dir),curr)
         idList.append(int(m.group(1)))
     return idList
 
