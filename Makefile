@@ -9,3 +9,6 @@ test:
 install:
 	$(MAKE) sdist
 	pip install ./dist/*.tar.gz
+
+init:
+	./init.sh
