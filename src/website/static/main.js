@@ -66,7 +66,28 @@ $(document).ready(function () {
             data_points.push(Math.random() * 10);
         }
         var payload = JSON.stringify({"time_points": time_points, "data_points": data_points});
-        $.ajax({url:"/timeseries", type:"POST", data:payload, contentType:"application/json"});
+        $.ajax({url:"/timeseries", type:"POST", data:payload, contentType:"application/json"})
+            .done(function(msg){
+                visualizeID(msg.id);
+            });
+    });
+
+    $("#upload-button").click(function(){
+        var files = $("#file-select").prop("files");
+        if (files.length <= 0){
+            return false;
+        }
+
+        var fReader = new FileReader();
+        fReader.onload = function(e){
+            var result = JSON.parse(e.target.result);
+            $.ajax({url:"/timeseries", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
+            .done(function(msg){
+                visualizeID(msg.id);
+            });
+        }
+
+        fReader.readAsText(files.item(0));
     })
 });
 
