@@ -1,6 +1,6 @@
 # CS207 Team 3 Red-Black Tree Library
 
-A key/value store that you'd use like BDB or SQLite.
+A library for a key/value store that you'd use like BDB or SQLite.
 
 Append-only Red-Black Tree-based data-store [Red-Black Tree is self-balancing binary search tree]. An update to a leaf updates the ancestor nodes. Common nodes are shared. Updates are flushed leaf-to-root to disk (so that disk addresses can be written to the parent nodes, and commit is an atomic update to a superblock, which just points at the new root node).
 
