@@ -25,7 +25,7 @@ class SMTimeSeries(SizedContainerTimeSeriesInterface):
                 SMTimeSeries: A time series containing time and data points.'''                
         
         if ident is None:
-            ident = hash((tuple(time_points), tuple(data_points)))
+            ident = abs(hash((tuple(time_points), tuple(data_points))))
         else:
             ident = str(ident)
         self._ident = ident

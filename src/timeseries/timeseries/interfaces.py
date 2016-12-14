@@ -123,20 +123,21 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
         inter_pts = []
         ts = list(pts)
+        data = list(iter(self))
         for t in ts:
             # Get the two time points bounding `pts`
             times = sorted(enumerate(self.itertimes()), key = lambda x: abs(x[1] - t))[:2]
             i1, t1 = times[0]
             i2, t2 = times[1]
             if t <= t1: 
-                inter_pts.append(self._data[i1])
+                inter_pts.append(data[i1])
             elif t >= t2:
-                inter_pts.append(self._data[i2])
+                inter_pts.append(data[i2])
             else:
                 dt = t2 - t1
-                dy = self._data[i2] - self._data[i1]
+                dy = data[i2] - data[i1]
                 m = dy / dt
-                y = m * (t - t1) + self._data[i1]
+                y = m * (t - t1) + data[i1]
                 inter_pts.append(y)
         return type(self)(ts, inter_pts)
 
