@@ -12,6 +12,7 @@ from .tsdb_ops import *
 from .tsdb_deserialize import *
 from .tsdb_error import *
 
+import pdb
 
 LENGTH_FIELD_LENGTH = 4
 DBSERVER_HOME = '/var/dbserver/'
@@ -71,12 +72,12 @@ class TSDB_Server(socketserver.BaseServer):
 
     def _with_ts(self, TSDBOp):
         ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
-        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def _with_id(self, TSDBOp):
         ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
-        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def get_ts_from_id(self, idee):
