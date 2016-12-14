@@ -1,7 +1,0 @@
-LICENSE
-MANIFEST.in
-README.md
-setup.py
-../../dist/rbtree.egg-info/SOURCES.txt
-rbtree/__init__.py
-rbtree/rbtree.py

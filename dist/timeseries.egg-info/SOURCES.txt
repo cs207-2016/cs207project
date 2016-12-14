@@ -9,3 +9,4 @@ timeseries/interfaces.py
 timeseries/smtimeseries.py
 timeseries/storagemanager.py
 timeseries/timeseries.py
+timeseries/util.py
