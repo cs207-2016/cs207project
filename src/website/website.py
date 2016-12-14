@@ -45,7 +45,7 @@ class TimeseriesEntry(db.Model):
     """
     __tablename__ = 'timeseries'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String, primary_key=True, autoincrement=True)
     blarg = db.Column(db.Float, nullable=False)
     level = db.Column(db.String(1), nullable=False)
     mean = db.Column(db.Float, nullable=False)
@@ -191,7 +191,7 @@ def create_entry():
     return jsonify(result), 201
 
 
-@app.route('/timeseries/<int:timeseries_id>', methods=['GET'])
+@app.route('/timeseries/<string:timeseries_id>', methods=['GET'])
 def get_timeseries_by_id(timeseries_id):
     """/timeseries/id GET endpoint
         Defines the following API call:
@@ -203,7 +203,6 @@ def get_timeseries_by_id(timeseries_id):
         abort(404)
         return
     logger.debug('Getting TimeseriesEntry with id=%s', timeseries_id)
-    ts = load_timeseries_from_file(te.fpath)
     time_points, data_points = zip(*ts.iteritems())
     result = {
         "time_points": time_points,
@@ -234,12 +233,11 @@ def get_simquery():
         logger.warning('Failed to get TimeseriesEntry with id=%s', timeseries_id)
         abort(404)
         return
-    ts = load_timeseries_from_file(te.fpath)
     # NOTE: PLEASE ADD SIMILARITY SEARCH
     sock = socket(AF_INET, SOCK_STREAM)
     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     sock.connect(('',15001))
-    op = TSDBOp_WithID(timeseries_id).to_json()
+    op = TSDBOp_withID(timeseries_id).to_json()
     sock.send(serialize(op))
 
     msg = sock.recv(65000)
@@ -248,8 +246,8 @@ def get_simquery():
     deserializer.append(msg)
     dmsg = deserializer.deserialize()
     tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
-    sim_ids = [random.randint(0, 10) for _ in range(6)]  # REPLACE THIS
-    return jsonify({"similar_ids": sim_ids, "similar_ts" : json.dumps(tseries_jsons)})
+    sim_ids = list(range(5))
+    return jsonify({"similar_ids": sim_ids, "similar_ts" : tseries_jsons})
 
 
 @app.route('/simquery', methods=['POST'])
