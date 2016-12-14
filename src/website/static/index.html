@@ -5,12 +5,15 @@
     <title>CS207 Visualizer</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="js/queue.min.js"></script>
     <link rel="stylesheet" type="text/css" href="main.css">
     <script type="text/javascript" src="main.js"></script>
+
 </head>
 <body>
 <h1>CS207 Visualizer</h1>
 <hr>
+
 <div>
     <h2>Select on paramgroups</h2>
     <form id="param-class">
@@ -39,18 +42,18 @@
 <div>
     <h2>Selected timeseries</h2>
     <table border="1">
-        <tr><td><svg width="800" height="400" id="selected-timeseries"></svg></td></tr>
+        <tr><td><svg width="800" height="400" id="similar-timeseries-1"></svg></td></tr>
     </table>
 </div>
 <hr>
 <div>
     <h2>Top 5 most similar timeseries</h2>
     <table border="1">
-        <tr><td><svg width="800" height="400" id="similar-timeseries-1"></svg><br /></td></tr>
         <tr><td><svg width="800" height="400" id="similar-timeseries-2"></svg><br /></td></tr>
         <tr><td><svg width="800" height="400" id="similar-timeseries-3"></svg><br /></td></tr>
         <tr><td><svg width="800" height="400" id="similar-timeseries-4"></svg><br /></td></tr>
         <tr><td><svg width="800" height="400" id="similar-timeseries-5"></svg><br /></td></tr>
+        <tr><td><svg width="800" height="400" id="similar-timeseries-6"></svg><br /></td></tr>
     </table>
 </div>
 <hr>

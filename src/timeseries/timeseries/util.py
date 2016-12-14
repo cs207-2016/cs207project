@@ -80,7 +80,7 @@ def generate_timeseries(count, path):
         m = np.random.random()
         s = np.random.random()
         times = np.arange(0.0, 1.0, 0.01)
-        vals = norm.pdf(times, m, s) + 0.01*np.random.randn(100)
+        vals = norm.pdf(times, m, s) + 0.1*np.random.randn(100)
         # This will store the time series data as an .npy file in `path`
         ts = SMTimeSeries(time_points=times, data_points=vals, sm=fsm)
 

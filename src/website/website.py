@@ -248,7 +248,7 @@ def get_simquery():
     deserializer.append(msg)
     dmsg = deserializer.deserialize()
     tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
-    
+    sim_ids = [random.randint(0, 10) for _ in range(6)]  # REPLACE THIS
     return jsonify({"similar_ids": sim_ids, "similar_ts" : json.dumps(tseries_jsons)})
 
 
@@ -272,7 +272,7 @@ def post_simquery():
         abort(400)
         return
     # NOTE: PLEASE ADD SIMILARITY SEARCH
-    sim_ids = [random.randint(0, 10) for _ in range(5)]  # REPLACE THIS
+    sim_ids = [random.randint(0, 10) for _ in range(6)]  # REPLACE THIS
     return jsonify({"similar_ids": sim_ids})
 
 @app.route('/')
