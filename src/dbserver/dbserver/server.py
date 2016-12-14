@@ -73,6 +73,8 @@ class TSDB_Server(socketserver.BaseServer):
                     response = self._with_ts(tsdbop)
                 elif isinstance(tsdbop, TSDBOp_withID):
                     response = self._with_id(tsdbop)
+                elif isinstance(tsdbop, TSDBOp_putTS):
+                    response = self._put_ts(tsdbop)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR, tsdbop['op'])
 
@@ -81,6 +83,9 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_ts(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
+        # print(TSDBOp['ts'])
+        # print(TSDBOp['ts']._times)
+        # print(TSDBOp['ts']._data)
         ids = get_similar_ts(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
@@ -88,9 +93,39 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_id(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries ID sent over the socket. Returns them as the payload of a TSDBOp_Return'''
+        TSDBOp['ts']
         ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
+
+    def _put_ts(self, TSDBOp):
+        ts = SMTimeSeries(time_points=TSDBOp['ts']._times, data_points=TSDBOp['ts']._data, sm=self.sm)
+        tsid = ts._ident
+        # print(tsid)
+        db_files = os.listdir(DIR_TS_DB)
+        # print (db_files)
+        for db_filename in db_files:
+            # print (db_filename)
+            # print(DIR_TS_DB + '/' + db_filename)
+            db = connect(DIR_TS_DB + '/' + db_filename)
+            vantage_pt_id = db.get(0)
+            # print(vantage_pt_id)
+            vantage_pt = SMTimeSeries.from_db(vantage_pt_id, self.sm)
+            # print(vantage_pt)
+            dist = 2*(1-kernel_corr(vantage_pt, TSDBOp['ts']))
+            # print(float(dist))
+            # print(type(float(dist)))
+            db.set(dist, str(tsid))
+            # print('set')
+            # pdb.set_trace()
+            db.commit()
+            # print('commit')
+            db.close()
+            db = connect(DIR_TS_DB + '/' + db_filename)
+            # print(db.get(dist))
+            db.close()
+            # print('closed')
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp)
 
     def get_ts_from_id(self, idee):
         '''Gets the TimeSeries data for a TimeSeries from the corresponding ID'''
