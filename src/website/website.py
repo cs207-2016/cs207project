@@ -1,11 +1,13 @@
-import logging
-import random
-import string
+import logging, random, string, json
 from flask import Flask, request, abort, jsonify, make_response
 from flask.ext.sqlalchemy import SQLAlchemy, DeclarativeMeta
-import json
+from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
 
 import timeseries
+from dbserver.tsdb_ops import *
+from dbserver.tsdb_deserialize import *
+from dbserver.tsdb_error import *
+
 
 logger = logging.getLogger(__name__)
 
@@ -234,8 +236,20 @@ def get_simquery():
         return
     ts = load_timeseries_from_file(te.fpath)
     # NOTE: PLEASE ADD SIMILARITY SEARCH
-    sim_ids = [random.randint(0, 10) for _ in range(5)]  # REPLACE THIS
-    return jsonify({"similar_ids": sim_ids})
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock.connect(('',15001))
+    op = TSDBOp_WithID(timeseries_id).to_json()
+    sock.send(serialize(op))
+
+    msg = sock.recv(65000)
+
+    deserializer = Deserializer()
+    deserializer.append(msg)
+    dmsg = deserializer.deserialize()
+    tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
+    
+    return jsonify({"similar_ids": sim_ids, "similar_ts" : json.dumps(tseries_jsons)})
 
 
 @app.route('/simquery', methods=['POST'])

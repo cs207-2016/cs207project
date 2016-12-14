@@ -71,12 +71,12 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
-        ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
+        ids = get_similar_ts_by_id(TSDBOp['ts'], 6, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def _with_id(self, TSDBOp):
-        ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
+        ids = get_similar_ts_by_id(TSDBOp['id'], 6, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
