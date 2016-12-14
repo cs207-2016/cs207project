@@ -174,3 +174,8 @@ def get_similar_ts(ts, count, timeseries_path, db_path):
     # Get `count` nearest ids and return
     nearest = sorted(distDict, key=distDict.__getitem__)[:count]
     return nearest
+
+def get_similar_ts_by_id(tsid, count, timeseries_path, db_path):
+    fsm = FileStorageManager(path=timeseries_path)
+    ts = SMTimeSeries.from_db(tsid, fsm)
+    return get_similar_ts(ts, count, timeseries_path, db_path)

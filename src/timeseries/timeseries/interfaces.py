@@ -4,6 +4,7 @@ import abc
 import numpy as np
 import numbers
 import math
+import json
 
 class TimeSeriesInterface(abc.ABC):
     '''A series of data points associated with time points.'''
@@ -307,6 +308,11 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
             s += (mean - i)**2
         return math.sqrt(s / (len(self) - 1))
 
+    def to_json(self):
+        ret = {}
+        ret['times'] = list(self.itertimes())
+        ret['values'] = list(iter(self))
+        return json.dumps(ret)
     
 class StreamTimeSeriesInterface(TimeSeriesInterface):
     '''Creates an interface for a Timeseries with no internal storage that
