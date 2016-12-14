@@ -7,6 +7,7 @@ import socketserver
 
 from timeseries.storagemanager import FileStorageManager
 from timeseries.util import *
+from timeseries import TimeSeries
 
 from .tsdb_ops import *
 from .tsdb_deserialize import *
@@ -67,12 +68,16 @@ class TSDB_Server(socketserver.BaseServer):
                 tsdbop = TSDBOp.from_json(msg)
             except TypeError as e:
                 response = TSDBOp_Return(TSDBStatus.INVALID_OPERATION, None)
+                status = TSDBStatus.INVALID_OPERATION
 
             if status is TSDBStatus.OK:
+
                 if isinstance(tsdbop, TSDBOp_withTS):
                     response = self._with_ts(tsdbop)
                 elif isinstance(tsdbop, TSDBOp_withID):
                     response = self._with_id(tsdbop)
+                elif isinstance(tsdbop, TSDBOp_putTS):
+                    response = self._put_ts(tsdbop)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR, tsdbop['op'])
 
@@ -81,6 +86,8 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_ts(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
+        if not isinstance(TSDBOp['ts'], TimeSeries):
+            return TSDBOp_Return(TSDBStatus.INVALID_COMPONENT, None)
         ids = get_similar_ts(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
@@ -88,9 +95,28 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_id(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries ID sent over the socket. Returns them as the payload of a TSDBOp_Return'''
-        ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
+        try:
+            ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
+        except KeyError:
+            return TSDBOp_Return(TSDBStatus.INVALID_KEY, None)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
+
+    def _put_ts(self, TSDBOp):
+        if not isinstance(TSDBOp['ts'], TimeSeries):
+            return TSDBOp_Return(TSDBStatus.INVALID_COMPONENT, None)
+        ts = SMTimeSeries(time_points=TSDBOp['ts']._times, data_points=TSDBOp['ts']._data, sm=self.sm)
+        tsid = ts._ident
+        db_files = os.listdir(DIR_TS_DB)
+        for db_filename in db_files:
+            db = connect(DIR_TS_DB + '/' + db_filename)
+            vantage_pt_id = db.get(0)
+            vantage_pt = SMTimeSeries.from_db(vantage_pt_id, self.sm)
+            dist = 2*(1-kernel_corr(vantage_pt, TSDBOp['ts']))
+            db.set(dist, str(tsid))
+            db.commit()
+            db.close()
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp)
 
     def get_ts_from_id(self, idee):
         '''Gets the TimeSeries data for a TimeSeries from the corresponding ID'''
