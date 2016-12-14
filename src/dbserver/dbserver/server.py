@@ -81,7 +81,7 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_ts(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
-        ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
+        ids = get_similar_ts(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
@@ -96,3 +96,7 @@ class TSDB_Server(socketserver.BaseServer):
         '''Gets the TimeSeries data for a TimeSeries from the corresponding ID'''
         ts = SMTimeSeries.from_db(idee, self.sm)
         return ts
+
+if __name__ == '__main__':
+    server = TSDB_Server()
+    server.run()
