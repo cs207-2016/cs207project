@@ -12,6 +12,7 @@ from .tsdb_ops import *
 from .tsdb_deserialize import *
 from .tsdb_error import *
 
+
 LENGTH_FIELD_LENGTH = 4
 DBSERVER_HOME = '/var/dbserver/'
 DIR_TS_DATA = DBSERVER_HOME + 'tsdata'
@@ -24,14 +25,14 @@ class TSDB_Server(socketserver.BaseServer):
         self.deserializer = Deserializer()
         self.sm = FileStorageManager(DIR_TS_DATA)
 
-    def handle_client(sock, client_addr):
+    def handle_client(self, sock, client_addr):
         print('Got connection from', client_addr)
         while True:
             msg = sock.recv(65536)
             if not msg:
                 break
-            json_response = data_received(msg)
-            sock.sendall(self.deserializer.serialize(json_response))
+            json_response = self.data_received(msg)
+            sock.sendall(json_response)
         print('Client closed connection')
         sock.close()
 
@@ -43,7 +44,7 @@ class TSDB_Server(socketserver.BaseServer):
         sock.listen(15)
 
         while True:
-            #print('connection')
+            print('connection')
             client_sock, client_addr = sock.accept()
             pool.submit(self.handle_client, client_sock, client_addr)
 
@@ -59,9 +60,9 @@ class TSDB_Server(socketserver.BaseServer):
                 response = TSDBOp_Return(TSDBStatus.INVALID_OPERATION, None)
 
             if status is TSDBStatus.OK:
-                if isinstance(op, TSDBOp_withTS):
+                if isinstance(tsdbop, TSDBOp_withTS):
                     response = self._with_ts(tsdbop)
-                elif isinstance(op, TSDBOp_withID):
+                elif isinstance(tsdbop, TSDBOp_withID):
                     response = self._with_id(tsdbop)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR, tsdbop['op'])
@@ -71,14 +72,12 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_ts(self, TSDBOp):
         ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [get_ts_from_id(idee).to_json() for idee in ids]
-        tsdump = json.dumps(tslist)
-        return TSDBOp_Return(TSDBStatus.OK, tsdump)
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def _with_id(self, TSDBOp):
         ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [get_ts_from_id(idee).to_json() for idee in ids]
-        tsdump = json.dumps(tslist)
-        return TSDBOp_Return(TSDBStatus.OK, tsdump)
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def get_ts_from_id(self, idee):
         ts = SMTimeSeries.from_db(idee, self.sm)
