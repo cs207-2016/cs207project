@@ -17,4 +17,4 @@ src/*.egg-info
 bin
 lib
 include
-
+*.DS_STORE
