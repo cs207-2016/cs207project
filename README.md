@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
-Team 3:
+Team 3:<br>
 Yamini Bansal
 Ariel Herbert-Voss
 Sophie Hilgard
@@ -30,7 +30,7 @@ src/
 	dbserver/: A red-black tree-based database for querying proximity between time series. This is implemented as a pip-installable library, which is used by a simple systemd service to serve queries over a socket.
 	timeseries/: A library for storing and manipulating time series.
 	rbtree/: An implementation of a red-black tree as a library.
-	website/: The project website, implemented using flask. 
+	website/: The project website, implemented using flask.
 
 <p>To build the `dbserver`, `timeseries`, or `rbtree` packages independently, run `make sdist` from the root directory of the project. The pip-installable python packages will be stored in the `dist` directory.</p>
 
