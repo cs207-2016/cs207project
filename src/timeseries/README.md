@@ -1,16 +1,16 @@
 # CS207 Team 3 Time Series Library
 
-# TODO: Someone update this to include storagemanager/smtimeseries
-
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
 A library for working with time series.
 
 A time series is an ordered series of data point indexed by or associated with time points. See [Wikipedia](https://en.wikipedia.org/wiki/Time_series) for more information.
 
-The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points. The following diagram show the class hierarchy:
+The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points.   
 
-![Class Hierarchy](images/class_hierarchy.png "Class Hierarchy")
+StorageManagerInterface is a an interface for managing persistent storage of time series under an identifier.
+
+SMTimeSeries implements the SizedContainerTimeSeriesInterface using a StorageManager for storage. If no `ident` is supplied, identical time series will receive the same identifier.
 
 ## Examples
 
