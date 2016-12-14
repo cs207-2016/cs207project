@@ -84,6 +84,7 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
+        ids = get_similar_ts_by_id(TSDBOp['ts'], 6, DIR_TS_DATA, DIR_TS_DB)
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
         if not isinstance(TSDBOp['ts'], TimeSeries):
@@ -99,6 +100,7 @@ class TSDB_Server(socketserver.BaseServer):
             ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         except KeyError:
             return TSDBOp_Return(TSDBStatus.INVALID_KEY, None)
+
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 

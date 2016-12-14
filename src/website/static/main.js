@@ -67,8 +67,8 @@ $(document).ready(function () {
                 element += "<td>" + timeseriesEntry.std + "</td>";
                 element += "<td>" + timeseriesEntry.level + "</td>";
                 element += "<td>" + timeseriesEntry.blarg + "</td>";
-                element += "<td><button type='button' onclick='visualizeID(" + timeseriesEntry.id;
-                element += ")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
+                element += "<td><button type='button' onclick='visualizeID(\"" + timeseriesEntry.id;
+                element += "\")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
                 element += "</tr>";
                 table.append(element);
             }
@@ -142,14 +142,21 @@ function visualizeIDOld(id){
 }
 
 
+function visualizeID(id){
+    $.get("/simquery?id="+id, function(data){
+        visualizeIDAnt(data)
+    });
+}
+
+
 //Anthony's
 function visualizeIDAnt(data){
     var svg = d3.select("#selected-timeseries");
 
-    for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
+    for(var i = 0; i < data.similar_ids.length && i < 6; ++i){
         visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)),data.similar_ts[i]);
     }
-    }
+}
 
 
 function visualize(id, svg, preData){
@@ -206,5 +213,4 @@ function visualize(id, svg, preData){
             updateWithJSON(data);
         });
     }
-}
 }

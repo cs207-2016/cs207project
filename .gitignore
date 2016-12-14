@@ -12,7 +12,7 @@ tsbtreedb/tsdb/*
 dist/*
 src/dist
 src/*.egg-info
-
+*~
 #Virtualenv
 bin
 lib
