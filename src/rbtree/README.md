@@ -28,28 +28,27 @@ Concurrent (dirty) readers are supported. Serialized fully transactional updates
  >>>'ts3.dat'
 
  '''
- Get all Less Than or Equal To
+ Get all Less Than or Equal To Keys and Values
  '''
- def test_db_get_All_LTE():
-   dbName = "/tmp/test2.dbdb"
-   if os.path.exists(dbName):
-        os.remove(dbName)
-   db = connect(dbName)
-   db.set(4.4, "ts484.dat")
-   db.set(0.0, "ts3.dat") #vantagePT
-   db.set(1.3, "ts82.dat")
-   db.set(2.9, "ts84.dat")
-   db.set(2.3, "ts382.dat")
-   db.set(2.1, "ts52.dat")
-   db.set(1.8, "ts49.dat")
-   db.set(1.1, "ts77.dat")
-   db.set(5.3, "ts583.dat")
-   keys, vals = db.get_All_LTE(2.9)
-   keys
-   >>>[2.1, 2.9, 2.3, 1.3, 1.8, 0.0, 1.1]
-   vals
-   >>>['ts52.dat','ts84.dat','ts382.dat','ts82.dat','ts49.dat','ts3.dat','ts77.dat']
-   db.commit()
-   db.close()
+ dbName = "/tmp/test2.dbdb"
+ if os.path.exists(dbName):
+      os.remove(dbName)
+ db = connect(dbName)
+ db.set(4.4, "ts484.dat")
+ db.set(0.0, "ts3.dat") #vantagePT
+ db.set(1.3, "ts82.dat")
+ db.set(2.9, "ts84.dat")
+ db.set(2.3, "ts382.dat")
+ db.set(2.1, "ts52.dat")
+ db.set(1.8, "ts49.dat")
+ db.set(1.1, "ts77.dat")
+ db.set(5.3, "ts583.dat")
+ keys, vals = db.get_All_LTE(2.9)
+ keys
+ >>>[2.1, 2.9, 2.3, 1.3, 1.8, 0.0, 1.1]
+ vals
+ >>>['ts52.dat','ts84.dat','ts382.dat','ts82.dat','ts49.dat','ts3.dat','ts77.dat']
+ db.commit()
+ db.close()
 
 ```
