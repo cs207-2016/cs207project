@@ -72,8 +72,8 @@ $(document).ready(function () {
                 element += "<td>" + timeseriesEntry.std + "</td>";
                 element += "<td>" + timeseriesEntry.level + "</td>";
                 element += "<td>" + timeseriesEntry.blarg + "</td>";
-                element += "<td><button type='button' onclick='visualizeID(" + timeseriesEntry.id;
-                element += ")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
+                element += "<td><button type='button' onclick='visualizeID(\"" + timeseriesEntry.id;
+                element += "\")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
                 element += "</tr>";
                 table.append(element);
             }
