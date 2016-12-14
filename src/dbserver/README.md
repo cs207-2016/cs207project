@@ -2,7 +2,7 @@
 
 This module is a socket-server for querying the proximity between time series.
 
-It is installed as a python library and executed as a background systemd service. The service is configured in dbserver.service and runs the executable start_dbserver.py.
+This is a pip installable library and executed as a background systemd service. The service is configured in dbserver.service and runs the executable start_dbserver.py.
 
 References directory of TimeSeries Databases.  Uses file storage manager to access directory of TimeSeries Databases.
 Unless otherwise specified, uses port 15001.
