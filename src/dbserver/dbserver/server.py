@@ -20,13 +20,17 @@ DIR_TS_DATA = DBSERVER_HOME + 'tsdata'
 DIR_TS_DB = DBSERVER_HOME + 'tsdb'
 
 class TSDB_Server(socketserver.BaseServer):
+    '''Class for TimeSeries Database Socket Server'''
 
     def __init__(self, addr=15001):
+        '''Initializes Socket Server with given port, storage manager, and
+        Deserializer for reading from bytestream'''
         self.addr = addr
         self.deserializer = Deserializer()
         self.sm = FileStorageManager(DIR_TS_DATA)
 
     def handle_client(self, sock, client_addr):
+        '''Manages client request and sends back response as serialized json'''
         print('Got connection from', client_addr)
         while True:
             msg = sock.recv(65536)
@@ -38,6 +42,8 @@ class TSDB_Server(socketserver.BaseServer):
         sock.close()
 
     def run(self):
+        '''Start TSDBServer and listen for client connections. Manage incoming connections
+        with threads.'''
         pool = ThreadPoolExecutor(50)
         sock = socket(AF_INET, SOCK_STREAM)
         sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -50,6 +56,8 @@ class TSDB_Server(socketserver.BaseServer):
             pool.submit(self.handle_client, client_sock, client_addr)
 
     def data_received(self, data):
+        '''Waits until the entire message has been received into the Deserializer, then Deserializes
+        a byte message from the socket back to its JSON representation.'''
         self.deserializer.append(data)
         if self.deserializer.ready():
             msg = self.deserializer.deserialize()
@@ -71,15 +79,24 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
-        ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
+        '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
+        from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
+        ids = get_similar_ts(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def _with_id(self, TSDBOp):
+        '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
+        from a TimeSeries ID sent over the socket. Returns them as the payload of a TSDBOp_Return'''
         ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def get_ts_from_id(self, idee):
+        '''Gets the TimeSeries data for a TimeSeries from the corresponding ID'''
         ts = SMTimeSeries.from_db(idee, self.sm)
         return ts
+
+if __name__ == '__main__':
+    server = TSDB_Server()
+    server.run()

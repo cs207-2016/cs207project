@@ -55,7 +55,7 @@ class TSDBOp_withTS(TSDBOp):
 
     @classmethod
     def from_json(cls, json_dict):
-        return cls(ts.TimeSeries(*(json_dict['ts'])))
+        return cls(ts.TimeSeries(json_dict['ts']['time_points'], json_dict['ts']['data_points']))
 
 class TSDBOp_Return(TSDBOp):
 
