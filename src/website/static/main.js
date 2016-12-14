@@ -1,3 +1,20 @@
+
+
+/*
+
+queue()
+    .defer(d3.json, "data.json")
+    .await(function(error, data) {
+
+        if (error) return console.error(error);
+
+        console.log("Data")
+        console.log(data);
+        visualizeID2(data);
+
+    });
+*/
+
 $(document).ready(function () {
     $("input[name=paramgroup]:radio").change(function () {
         $(".dynamic-vals").remove();
@@ -112,7 +129,9 @@ $(document).ready(function () {
     });
 });
 
-function visualizeID(id){
+
+
+function visualizeIDOld(id){
     var svg = d3.select("#selected-timeseries");
     visualize(id, svg);
     $.get("/simquery?id="+id, function(data){
@@ -122,7 +141,20 @@ function visualizeID(id){
     });
 }
 
+
+//Anthony's
+function visualizeIDAnt(data){
+    var svg = d3.select("#selected-timeseries");
+
+    for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
+        visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)),data.similar_ts[i]);
+    }
+    }
+
+
 function visualize(id, svg, preData){
+    console.log(id)
+    console.log(preData)
     svg.selectAll("*").remove();
 
     var margin = {top: 30, right: 20, bottom:30, left:30};
@@ -174,4 +206,5 @@ function visualize(id, svg, preData){
             updateWithJSON(data);
         });
     }
+}
 }
