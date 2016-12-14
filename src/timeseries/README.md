@@ -1,7 +1,5 @@
 # CS207 Team 3 Time Series Library
 
-# TODO: Someone update this to include storagemanager/smtimeseries
-
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
 A library for working with time series.
