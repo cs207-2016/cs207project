@@ -85,18 +85,44 @@ $(document).ready(function () {
             .done(function(msg){
                 visualizeID(msg.id);
             });
-        }
+        };
 
         fReader.readAsText(files.item(0));
-    })
+    });
+
+    $("#similar-button").click(function(){
+        var files = $("#file-select").prop("files");
+        if (files.length <= 0){
+            return false;
+        }
+
+        var fReader = new FileReader();
+        fReader.onload = function(e){
+            var result = JSON.parse(e.target.result);
+            visualize(undefined, d3.select("#selected-timeseries"), result);
+            $.ajax({url:"/simquery", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
+            .done(function(msg){
+                for(var i = 0; i < msg.similar_ids.length && i < 5; ++i){
+                    visualize(msg.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)));
+                }
+            });
+        };
+
+        fReader.readAsText(files.item(0));
+    });
 });
 
 function visualizeID(id){
     var svg = d3.select("#selected-timeseries");
     visualize(id, svg);
+    $.get("/simquery?id="+id, function(data){
+        for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
+            visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)));
+        }
+    });
 }
 
-function visualize(id, svg){
+function visualize(id, svg, preData){
     svg.selectAll("*").remove();
 
     var margin = {top: 30, right: 20, bottom:30, left:30};
@@ -115,7 +141,7 @@ function visualize(id, svg){
 
     var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
 
-    d3.json("/timeseries/"+id, function(error, data){
+    function updateWithJSON(data){
         var dataObjs = [];
         for(var i = 0; i < data.time_points.length; ++i){
             var newObj = {time:data.time_points[i], value:data.data_points[i]};
@@ -138,5 +164,14 @@ function visualize(id, svg){
 
         g.append("g").attr("class","y axis")
             .call(yAxis);
-    });
+    }
+
+    if (preData != undefined){
+        updateWithJSON(preData);
+    }
+    else {
+        d3.json("/timeseries/" + id, function (error, data) {
+            updateWithJSON(data);
+        });
+    }
 }
