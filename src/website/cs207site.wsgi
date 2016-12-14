@@ -1,9 +1,7 @@
 import sys
-sys.path.insert(0, '/var/www/cs207site/website')
-#from website import app as application
-import website
+sys.path.insert(0, '/var/www/cs207site')
+from website import app as application
 
-application = website.app
 
 
 
