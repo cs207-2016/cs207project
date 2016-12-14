@@ -6,6 +6,7 @@ from scipy.stats import norm
 
 from .storagemanager import FileStorageManager
 from .smtimeseries import SMTimeSeries
+from .timeseries import *
 
 from rbtree import *
 
@@ -179,3 +180,14 @@ def get_similar_ts_by_id(tsid, count, timeseries_path, db_path):
     fsm = FileStorageManager(path=timeseries_path)
     ts = SMTimeSeries.from_db(tsid, fsm)
     return get_similar_ts(ts, count, timeseries_path, db_path)
+
+def random_ts(a):
+    '''Generate TS from random uniform distribution
+    Args:
+    a: Random Mulitplier
+    Output:
+    A timeseries from 0,1 Uniform Distribution * a mulitplier
+    '''
+    t = np.arange(0.0, 1.0, 0.01)
+    v = a*np.random.random(100)
+    return TimeSeries(t,v)
