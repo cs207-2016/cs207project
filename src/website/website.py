@@ -264,14 +264,25 @@ def post_simquery():
         abort(400)
         return
     try:
-        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
+#        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
+        op = TSDBOp_withTS(request.json).to_json()
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
         abort(400)
         return
-    # NOTE: PLEASE ADD SIMILARITY SEARCH
-    sim_ids = [random.randint(0, 10) for _ in range(6)]  # REPLACE THIS
-    return jsonify({"similar_ids": sim_ids})
+    
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock.connect(('',15001))
+    sock.send(serialize(op))
+    msg = sock.recv(65000)
+    deserializer = Deserializer()
+    deserializer.append(msg)
+    dmsg = deserializer.deserialize()
+    tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
+    sim_ids = list(range(5))
+
+    return jsonify({"similar_ids": sim_ids, "similar_ts" : tseries_jsons})
 
 @app.route('/')
 def root():
