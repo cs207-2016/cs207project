@@ -93,7 +93,6 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_id(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries ID sent over the socket. Returns them as the payload of a TSDBOp_Return'''
-        TSDBOp['ts']
         ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
