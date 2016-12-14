@@ -13,9 +13,13 @@ queue()
         visualizeID2(data);
 
     });
+
 */
 
+var d1 = [[1, 300], [2, 600], [3, 550], [4, 400], [5, 300]];
+
 $(document).ready(function () {
+    $.plot($("#placeholder"), [d1]);
     $("input[name=paramgroup]:radio").change(function () {
         $(".dynamic-vals").remove();
         var paramValue = $("#param-value");
@@ -24,7 +28,8 @@ $(document).ready(function () {
             paramValue.append("<div class='dynamic-vals'>Upper Bound:<br /><input type='number' id='upper' /></div>");
         }
         else if ($(this).val() == "level") {
-            paramValue.append("<div class='dynamic-vals'>Categories:<br /><input type='string' id='categories' /></div>");
+            paramValue.append("<div class='dyn" +
+                "amic-vals'>Categories:<br /><input type='string' id='categories' /></div>");
         }
         else {
             paramValue.append("<div class='dynamic-vals'>None</div>");
@@ -67,8 +72,8 @@ $(document).ready(function () {
                 element += "<td>" + timeseriesEntry.std + "</td>";
                 element += "<td>" + timeseriesEntry.level + "</td>";
                 element += "<td>" + timeseriesEntry.blarg + "</td>";
-                element += "<td><button type='button' onclick='visualizeID(\"" + timeseriesEntry.id;
-                element += "\")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
+                element += "<td><button type='button' onclick='visualizeID(" + timeseriesEntry.id;
+                element += ")' id='viz" + timeseriesEntry.id + "'>Visualize</button></td>";
                 element += "</tr>";
                 table.append(element);
             }
@@ -141,11 +146,41 @@ function visualizeIDOld(id){
     });
 }
 
-
 function visualizeID(id){
+    console.log("visualizeID called");
     $.get("/simquery?id="+id, function(data){
-        visualizeIDAnt(data)
+        visualizeFlask(data);
+        visualizeIDAnt(data);
     });
+}
+
+function visualizeFlask(data){
+    console.log("Flask Orig Data");
+    console.log(data);
+    flotData = [];
+
+    for(var i = 0; i < data.similar_ids.length; ++i){
+        a = data.similar_ts[i].time_points;
+        b =data.similar_ts[i].data_points;
+        var c = a.map(function (e, i) {
+            return [e, b[i]];
+        });
+        var currLabel;
+        if (i==0) {
+            currLabel = "Ref TS";
+        } else {
+            currLabel = "Sim "+i;
+        }
+        flotData[i] = {label: currLabel, data: c};
+
+        console.log(c);
+        //$.plot($("#placeholder"), [c]);
+
+    }
+    console.log("Flot Data");
+    console.log(flotData);
+    $.plot($("#placeholder"), flotData);
+
 }
 
 
@@ -153,15 +188,16 @@ function visualizeID(id){
 function visualizeIDAnt(data){
     var svg = d3.select("#selected-timeseries");
 
-    for(var i = 0; i < data.similar_ids.length && i < 6; ++i){
+    for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
         visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)),data.similar_ts[i]);
     }
 }
 
 
 function visualize(id, svg, preData){
-    console.log(id)
-    console.log(preData)
+    console.log("D3 Data");
+    console.log(id);
+    console.log(preData);
     svg.selectAll("*").remove();
 
     var margin = {top: 30, right: 20, bottom:30, left:30};
