@@ -191,3 +191,16 @@ def random_ts(a):
     t = np.arange(0.0, 1.0, 0.01)
     v = a*np.random.random(100)
     return TimeSeries(t,v)
+
+def tsmaker(m, s, j):
+    '''Generate TS from Normal PDF with mean m and stand s
+    Args:
+    m: Mean of Normal PDF
+    s: Standard deviation of Normal PDF
+    j: Random Mulitplier
+    Output:
+    A timeseries from Normal PDF with mean m and stand s
+    '''
+    t = np.arange(0.0, 1.0, 0.01)
+    v = norm.pdf(t, m, s) + j*np.random.randn(100)
+    return TimeSeries(t,v)
