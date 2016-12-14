@@ -86,7 +86,6 @@ class TSDB_Server(socketserver.BaseServer):
     def _with_ts(self, TSDBOp):
         '''Gets 6 TimeSeries representations (including the original queried TS) from StorageManager
         from a TimeSeries representation sent over the socket. Returns them as the payload of a TSDBOp_Return'''
-        pdb.set_trace()
         if not isinstance(TSDBOp['ts'], TimeSeries):
             return TSDBOp_Return(TSDBStatus.INVALID_COMPONENT, None)
         ids = get_similar_ts(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
