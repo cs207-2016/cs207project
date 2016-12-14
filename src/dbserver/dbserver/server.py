@@ -1,35 +1,38 @@
 from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
 from concurrent.futures import ThreadPoolExecutor
 import threading
-from .tsdb_ops import *
-from .tsdb_deserialize import *
-from .tsdb_error import *
-from .util import genSIM
-from timeseries.storagemanager import FileStorageManager
 import json
 import enum
 import socketserver
-import pickle
+
+from timeseries.storagemanager import FileStorageManager
+from timeseries.util import *
+
+from .tsdb_ops import *
+from .tsdb_deserialize import *
+from .tsdb_error import *
+
 
 LENGTH_FIELD_LENGTH = 4
 DBSERVER_HOME = '/var/dbserver/'
-TIMESERIES_DIR = 'tsdata'
+DIR_TS_DATA = DBSERVER_HOME + 'tsdata'
+DIR_TS_DB = DBSERVER_HOME + 'tsdb'
 
 class TSDB_Server(socketserver.BaseServer):
 
     def __init__(self, addr=15001):
         self.addr = addr
         self.deserializer = Deserializer()
-        self.sm = FileStorageManager(DBSERVER_HOME+TIMESERIES_DIR)
+        self.sm = FileStorageManager(DIR_TS_DATA)
 
-    def handle_client(sock, client_addr):
+    def handle_client(self, sock, client_addr):
         print('Got connection from', client_addr)
         while True:
             msg = sock.recv(65536)
             if not msg:
                 break
-            json_response = data_received(msg)
-            sock.sendall(self.deserializer.serialize(json_response))
+            json_response = self.data_received(msg)
+            sock.sendall(json_response)
         print('Client closed connection')
         sock.close()
 
@@ -57,9 +60,9 @@ class TSDB_Server(socketserver.BaseServer):
                 response = TSDBOp_Return(TSDBStatus.INVALID_OPERATION, None)
 
             if status is TSDBStatus.OK:
-                if isinstance(op, TSDBOp_withTS):
+                if isinstance(tsdbop, TSDBOp_withTS):
                     response = self._with_ts(tsdbop)
-                elif isinstance(op, TSDBOp_withID):
+                elif isinstance(tsdbop, TSDBOp_withID):
                     response = self._with_id(tsdbop)
                 else:
                     response = TSDBOp_Return(TSDBStatus.UNKNOWN_ERROR, tsdbop['op'])
@@ -67,17 +70,15 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
-        ids = genSIM(TSDBOp['ts'])
-        tslist = [get_file_from_id(idee) for idee in ids]
-        tsdump = pickle.dumps(tslist)
-        return TSDBOp_Return(TSDBStatus.OK, tsdump)
+        ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
+        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
     def _with_id(self, TSDBOp):
-        ids = genSIM(TSDBOp['id'])
-        tslist = [get_file_from_id(idee) for idee in ids]
-        tsdump = pickle.dumps(tslist)
-        return TSDBOp_Return(TSDBStatus.OK, tsdump)
+        ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
+        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 
-    def get_file_from_id(self, idee):
+    def get_ts_from_id(self, idee):
         ts = SMTimeSeries.from_db(idee, self.sm)
         return ts

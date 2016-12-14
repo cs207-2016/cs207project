@@ -11,7 +11,7 @@ sudo pip3 install flask Flask_SQLAlchemy setuptools pytest SQLAlchemy
 
 # Build and install our libraries
 make sdist
-sudo pip3 install ./dist/timeseries*.tar.gz ./dist/rbtree*.tar.gz ./dist/dbserver*.tar.gz
+sudo pip3 install ./dist/timeseries*.tar.gz ./dist/rbtree*.tar.gz ./dist/dbserver*.tar.gz --upgrade --force-reinstall
 
 # Initialize time series database server
 sudo useradd -r -s /bin/false dbserver

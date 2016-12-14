@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from dbserver.server import TSDB_Server
-from dbserver.util import genTS, genDB
+from timeseries.util import *
 import os.path, os
 
 DIR_TS_DATA = '/var/dbserver/tsdata'
@@ -15,12 +15,11 @@ if __name__ == '__main__':
 
         # If the random time series haven't yet been generated, generate them
         if not os.path.exists(DIR_TS_DATA):
-                os.makedirs(DIR_TS_DATA)
-                genTS(nTS = 1000, file_dir=DIR_TS_DATA)
+            os.makedirs(DIR_TS_DATA)
+            generate_timeseries(1000, DIR_TS_DATA)
         if not os.path.exists(DIR_TS_DB):
-                os.makedirs(DIR_TS_DB)
-                genDB(tsdata_dir=DIR_TS_DATA, db_dir=DIR_TS_DB)
-                
+            os.makedirs(DIR_TS_DB)
+            generate_vantage_points(20, DIR_TS_DATA, DIR_TS_DB)                
         main()
 
 
