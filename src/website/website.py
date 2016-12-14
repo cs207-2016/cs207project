@@ -183,7 +183,8 @@ def create_entry():
         "mean": mean,
         "std": std,
         "blarg": blarg,
-        "level": level
+        "level": level,
+        "id" : prod.id
     }
     return jsonify(result), 201
 
