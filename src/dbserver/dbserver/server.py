@@ -1,26 +1,28 @@
 from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
 from concurrent.futures import ThreadPoolExecutor
 import threading
-from .tsdb_ops import *
-from .tsdb_deserialize import *
-from .tsdb_error import *
-from .util import genSIM
-from timeseries.storagemanager import FileStorageManager
 import json
 import enum
 import socketserver
-import pickle
+
+from timeseries.storagemanager import FileStorageManager
+from timeseries.util import *
+
+from .tsdb_ops import *
+from .tsdb_deserialize import *
+from .tsdb_error import *
 
 LENGTH_FIELD_LENGTH = 4
 DBSERVER_HOME = '/var/dbserver/'
-TIMESERIES_DIR = 'tsdata'
+DIR_TS_DATA = DBSERVER_HOME + 'tsdata'
+DIR_TS_DB = DBSERVER_HOME + 'tsdb'
 
 class TSDB_Server(socketserver.BaseServer):
 
     def __init__(self, addr=15001):
         self.addr = addr
         self.deserializer = Deserializer()
-        self.sm = FileStorageManager(DBSERVER_HOME+TIMESERIES_DIR)
+        self.sm = FileStorageManager(DIR_TS_DATA)
 
     def handle_client(sock, client_addr):
         print('Got connection from', client_addr)
@@ -41,7 +43,7 @@ class TSDB_Server(socketserver.BaseServer):
         sock.listen(15)
 
         while True:
-            print('connection')
+            #print('connection')
             client_sock, client_addr = sock.accept()
             pool.submit(self.handle_client, client_sock, client_addr)
 
@@ -67,17 +69,17 @@ class TSDB_Server(socketserver.BaseServer):
             return serialize(response.to_json())
 
     def _with_ts(self, TSDBOp):
-        ids = genSIM(TSDBOp['ts'])
-        tslist = [get_file_from_id(idee) for idee in ids]
-        tsdump = pickle.dumps(tslist)
+        ids = get_similar_ts_by_id(TSDBOp['ts'], 5, DIR_TS_DATA, DIR_TS_DB)
+        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        tsdump = json.dumps(tslist)
         return TSDBOp_Return(TSDBStatus.OK, tsdump)
 
     def _with_id(self, TSDBOp):
-        ids = genSIM(TSDBOp['id'])
-        tslist = [get_file_from_id(idee) for idee in ids]
-        tsdump = pickle.dumps(tslist)
+        ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
+        tslist = [get_ts_from_id(idee).to_json() for idee in ids]
+        tsdump = json.dumps(tslist)
         return TSDBOp_Return(TSDBStatus.OK, tsdump)
 
-    def get_file_from_id(self, idee):
+    def get_ts_from_id(self, idee):
         ts = SMTimeSeries.from_db(idee, self.sm)
         return ts

@@ -13,13 +13,6 @@ def serialize(json_obj):
     length_bytes = (len(json_bytes)+LENGTH_FIELD_LENGTH).to_bytes(LENGTH_FIELD_LENGTH, byteorder="little")
     return length_bytes + json_bytes
 
-def pickle_serialize(pickle_bytes):
-    '''Turn a JSON object into bytes suitable for writing out to the network.
-    Includes a fixed-width length field to simplify reconstruction on the other
-    end of the wire.'''
-    length_bytes = (len(pickle_bytes)+LENGTH_FIELD_LENGTH).to_bytes(LENGTH_FIELD_LENGTH, byteorder="little")
-    return length_bytes + pickle_bytes
-
 class Deserializer(object):
     '''A buffering and bytes-to-json engine.
     Data can be received in arbitrary chunks of bytes, and we need a way to
@@ -58,19 +51,4 @@ class Deserializer(object):
             return obj
         except json.JSONDecodeError:
             print('Invalid JSON object received:\n'+str(json_str))
-            return None
-
-    def pickle_deserialize(self):
-        bytestring = self.buf[LENGTH_FIELD_LENGTH:self.buflen].decode()
-        self.buf = self.buf[self.buflen:]
-        self.buflen = -1
-        # There may be more data in the buffer already, so preserve it
-        self._maybe_set_length()
-        try:
-            #Note how now everything is assumed to be an OrderedDict
-            obj = pickle.loads(bytestring)
-            #print("OBJ", obj)
-            return obj
-        except Exception as e:
-            print('Invalid pickle object received:\n'+str(bytestring))
             return None
