@@ -4,6 +4,7 @@ from flask.ext.sqlalchemy import SQLAlchemy, DeclarativeMeta
 from socket import AF_INET, SOCK_STREAM, socket, SOL_SOCKET, SO_REUSEADDR
 
 import timeseries
+from timeseries import *
 from dbserver.tsdb_ops import *
 from dbserver.tsdb_deserialize import *
 from dbserver.tsdb_error import *
@@ -163,6 +164,7 @@ def create_entry():
     logger.debug('Creating TimeseriesEntry')
 
     try:
+        req = request.json
         op = TSDBOp_putTS(request.json).to_json()
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
@@ -174,21 +176,23 @@ def create_entry():
     sock.connect(('',15001))
     sock.send(serialize(op))
     msg = sock.recv(65000)
-    deserializer = Deserializer()
-    deserializer.append(msg)
-    dmsg = deserializer.deserialize()
-    tseries_json =  json.loads(dmsg['op']['ts'])
-    ts = TimeSeries(tseries_json['times'], tseries_json['values'])
+    ts = TimeSeries(req['time_points'], req['data_points'])
     
     mean = ts.mean()  # Get mean and standard deviation from object
     std = ts.std()
     blarg = random.random()
     level = random.choice(["A", "B", "C", "D", "E", "F"])
-
+    fpath = ''
     # Create TimeseriesEntry
-    prod = TimeseriesEntry(blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
-    db.session.add(prod)
-    db.session.commit()
+    times = request.json["time_points"]
+    vals = request.json["data_points"]
+    tsid = abs(hash((tuple(times), tuple(vals))))
+    prod = TimeseriesEntry(id=tsid, blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
+    try:
+        db.session.add(prod)
+        db.session.commit()
+    except:
+        pass
     result = {
         "time_points": request.json["time_points"],
         "data_points": request.json["data_points"],
@@ -196,10 +200,10 @@ def create_entry():
         "std": std,
         "blarg": blarg,
         "level": level,
-        "id" : prod.id
+        "id" : tsid
     }
 
-    return jsonify({"similar_ids": [0], "similar_ts" : [ts.to_json()]})
+    return jsonify({"similar_ids": [0], "similar_ts" : [json.loads(ts.to_json())]})
 
 
 @app.route('/timeseries/<string:timeseries_id>', methods=['GET'])
@@ -214,10 +218,21 @@ def get_timeseries_by_id(timeseries_id):
         abort(404)
         return
     logger.debug('Getting TimeseriesEntry with id=%s', timeseries_id)
-    time_points, data_points = zip(*ts.iteritems())
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock.connect(('',15001))
+    op = TSDBOp_withID(timeseries_id).to_json()
+    sock.send(serialize(op))
+    msg = sock.recv(65000)
+
+    deserializer = Deserializer()
+    deserializer.append(msg)
+    dmsg = deserializer.deserialize()
+    tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
+
     result = {
-        "time_points": time_points,
-        "data_points": data_points,
+        "time_points": tseries_jsons[0]['time_points'],
+        "data_points": tseries_jsons[0]['data_points'],
         "mean": te.mean,
         "std": te.std,
         "blarg": te.blarg,
@@ -250,14 +265,13 @@ def get_simquery():
     sock.connect(('',15001))
     op = TSDBOp_withID(timeseries_id).to_json()
     sock.send(serialize(op))
-
     msg = sock.recv(65000)
 
     deserializer = Deserializer()
     deserializer.append(msg)
     dmsg = deserializer.deserialize()
     tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
-    sim_ids = list(range(5))
+    sim_ids = list(range(6))
     return jsonify({"similar_ids": sim_ids, "similar_ts" : tseries_jsons})
 
 
@@ -292,7 +306,7 @@ def post_simquery():
     deserializer.append(msg)
     dmsg = deserializer.deserialize()
     tseries_jsons = [json.loads(x) for x in json.loads(dmsg['payload'])]
-    sim_ids = list(range(5))
+    sim_ids = list(range(6))
 
     return jsonify({"similar_ids": sim_ids, "similar_ts" : tseries_jsons})
 

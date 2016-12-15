@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
+[![Website URL](http://ec2-174-129-135-178.compute-1.amazonaws.com/)]
+
 Team 3:<br>
 Yamini Bansal<br>
 Ariel Herbert-Voss<br>
@@ -35,3 +37,14 @@ src/
 <p>To build the `dbserver`, `timeseries`, or `rbtree` packages independently, run `make sdist` from the root directory of the project. The pip-installable python packages will be stored in the `dist` directory.</p>
 
 <p>To run our unit tests, run `make test` from the root of the project.</p>
+
+<p>JSON files must be of the following format:</p><br>
+
+```json
+{
+  'time_points' : [<time points>],
+  'data_points' : [<data points>]
+}
+```
+
+<p>Time series identifiers are managed internally and need not be included in the uploaded file.</p>
