@@ -23,14 +23,48 @@ Example:
 from context import *
 
 
+
+class FlaskTest:
+    def __init__(self):
+        self.client = None
+
+    def __enter__(self):
+        self.app_context = website.app.app_context()
+        self.app_context.push()
+        website.db.create_all()
+        self.client = website.app.test_client()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        website.db.session.remove()
+        website.db.drop_all()
+
+    def get_request(self, endpoint):
+        resp = self.client.get(endpoint)
+        return resp.get_data(as_text=True)
+
 '''
-Functions Being Tested: Len
-Summary: Basic Len Test
+Test of statically served content: index.html
 '''
-def test_len():
-    website.db.create_all()
-    with website.app.test_request_context("/") as context:
-        website.app.preprocess_request()
-        resp = website.app.process_response(website.root())
-        resp.direct_passthrough = False
-        assert "CS207 Visualizer" in str(resp.data)
+def test_html():
+    with FlaskTest() as ft:
+        assert "CS207 Visualizer" in ft.get_request("/")
+
+'''
+Test of statically served content: main.js
+'''
+def test_js():
+    with FlaskTest() as ft:
+        assert len(ft.get_request("/main.js")) > 0
+
+'''
+Test of statically served content: main.css
+'''
+def test_css():
+    with FlaskTest() as ft:
+        assert len(ft.get_request("/main.css")) > 0
+
+'''
+Test adding a timeseries object via POST
+'''
+# def test_add_ts():
