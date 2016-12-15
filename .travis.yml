@@ -2,18 +2,15 @@ language: python
 python:
     - "3.5"
 sudo: required
+services:
+    - docker
 before_install:
-    - pip install pytest pytest-cov
-    - pip install coveralls
-    - pip install portalocker 
-    - pip install scipy
-    - pip install flask Flask_SQLAlchemy SQLAlchemy psycopg2
-    - make sdist
-    - pip install ./dist/rbtree-0.1.tar.gz
-    - pip install ./dist/timeseries-0.1.tar.gz
-    - pip install ./dist/dbserver-1.0.tar.gz
-    - ./init.sh
+    - docker build -t test-image .
+    - docker run -d --name test test-image
+    - docker exec test init.sh
+    - docker ps -a
 script:
-    - py.test
+    - docker exec test py.test
 after_success:
+    - docker rm -f test
     - coveralls
