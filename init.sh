@@ -16,10 +16,10 @@ sudo pip3 install ./dist/timeseries*.tar.gz ./dist/rbtree*.tar.gz ./dist/dbserve
 # Initialize time series database server
 sudo useradd -r -s /bin/false dbserver
 sudo mkdir /var/dbserver
-sudo chown -R dbserver:dbserver /var/dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
 sudo chmod 777 -R /var/dbserver
+sudo chown -R dbserver:dbserver /var/dbserver
 
 # Initialize postgres server
 sudo -u postgres bash -c "psql -c \"CREATE USER cs207site WITH PASSWORD 'cs207isthebest';\""
