@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sqlalchemy
 from sqlalchemy import create_engine
