@@ -19,6 +19,7 @@ sudo mkdir /var/dbserver
 sudo chown dbserver:dbserver /var/dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
+sudo chmod 777 -R /var/dbserver/tsdata /var/dbserver/tsdb
 sudo systemctl daemon-reload
 sudo systemctl enable dbserver.service
 sudo systemctl start dbserver.service

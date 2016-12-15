@@ -121,7 +121,7 @@ $(document).ready(function () {
         var fReader = new FileReader();
         fReader.onload = function(e){
             var result = JSON.parse(e.target.result);
-            visualize(undefined, d3.select("#selected-timeseries"), result);
+            //visualize(undefined, d3.select("#selected-timeseries"), result);
             $.ajax({url:"/simquery", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
             .done(function(msg){
                 for(var i = 0; i < msg.similar_ids.length && i < 5; ++i){
