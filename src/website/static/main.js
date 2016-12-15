@@ -1,22 +1,5 @@
 
-
-/*
-
-queue()
-    .defer(d3.json, "data.json")
-    .await(function(error, data) {
-
-        if (error) return console.error(error);
-
-        console.log("Data")
-        console.log(data);
-        visualizeID2(data);
-
-    });
-
-*/
-
-var d1 = [[1, 300], [2, 600], [3, 550], [4, 400], [5, 300]];
+var d1 = [[0, 0]];
 
 $(document).ready(function () {
     $.plot($("#placeholder"), [d1]);
@@ -121,12 +104,14 @@ $(document).ready(function () {
         var fReader = new FileReader();
         fReader.onload = function(e){
             var result = JSON.parse(e.target.result);
-            //visualize(undefined, d3.select("#selected-timeseries"), result);
+            console.log("### fReader Data ###");
+            console.log(result);
             $.ajax({url:"/simquery", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
             .done(function(msg){
-                for(var i = 0; i < msg.similar_ids.length && i < 5; ++i){
-                    visualize(msg.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)));
-                }
+                //for(var i = 0; i < msg.similar_ids.length && i < 5; ++i){
+                    //visualize(msg.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)));
+                //}
+                visualizeFlot2(result, msg)
             });
         };
 
@@ -134,28 +119,16 @@ $(document).ready(function () {
     });
 });
 
-
-
-function visualizeIDOld(id){
-    var svg = d3.select("#selected-timeseries");
-    visualize(id, svg);
-    $.get("/simquery?id="+id, function(data){
-        for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
-            visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)));
-        }
-    });
-}
-
+//With ID Get Data and Call Visualization Function
 function visualizeID(id){
-    console.log("visualizeID called");
     $.get("/simquery?id="+id, function(data){
-        visualizeFlask(data);
-        visualizeIDAnt(data);
+        visualizeFlot(data);
     });
 }
 
-function visualizeFlask(data){
-    console.log("Flask Orig Data");
+//Given ID : Plot Data
+function visualizeFlot(data){
+    console.log("### Flot Orig Data ###");
     console.log(data);
     flotData = [];
 
@@ -173,80 +146,47 @@ function visualizeFlask(data){
         }
         flotData[i] = {label: currLabel, data: c};
 
-        console.log(c);
         //$.plot($("#placeholder"), [c]);
 
     }
-    console.log("Flot Data");
+    console.log("### Flot Final Data ###");
     console.log(flotData);
     $.plot($("#placeholder"), flotData);
 
 }
 
 
-//Anthony's
-function visualizeIDAnt(data){
-    var svg = d3.select("#selected-timeseries");
+//Uploaded TS: Plot data
+function visualizeFlot2(orig, data){
+    console.log("### Flot2 Compare TS ###");
+    console.log(orig);
+    console.log("### Flot2 Compare Sim TS ###");
+    console.log(data);
+    flotData = [];
+    var currLabel = "Ref Ts"
+    flotData[0] = {label: currLabel, data: orig};
 
-    for(var i = 0; i < data.similar_ids.length && i < 5; ++i){
-        visualize(data.similar_ids[i], d3.select("#similar-timeseries-"+(i+1)),data.similar_ts[i]);
-    }
-}
 
-
-function visualize(id, svg, preData){
-    console.log("D3 Data");
-    console.log(id);
-    console.log(preData);
-    svg.selectAll("*").remove();
-
-    var margin = {top: 30, right: 20, bottom:30, left:30};
-    var width = svg.attr("width") - margin.left - margin.right;
-    var height = svg.attr("height") - margin.top - margin.bottom;
-
-    var x = d3.scale.linear().range([0, width]);
-    var y = d3.scale.linear().range([height, 0]);
-
-    var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(10);
-    var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-    var valueline = d3.svg.line()
-        .x(function(d){ return x(d.time);})
-        .y(function(d){ return y(d.value);});
-
-    var g = svg.append("g").attr("transform","translate("+margin.left+","+margin.top+")");
-
-    function updateWithJSON(data){
-        var dataObjs = [];
-        for(var i = 0; i < data.time_points.length; ++i){
-            var newObj = {time:data.time_points[i], value:data.data_points[i]};
-            dataObjs.push(newObj);
-        }
-        x.domain(d3.extent(dataObjs, function(d){ return d.time;}));
-        y.domain([0, d3.max(dataObjs, function(d){ return d.value;})]);
-
-        g.append("path").attr("class","line").attr("d", valueline(dataObjs));
-
-        g.selectAll("dot").data(dataObjs)
-            .enter().append("circle")
-            .attr("r",3.5)
-            .attr("cx", function(d){ return x(d.time); })
-            .attr("cy", function(d){ return y(d.value); });
-
-        g.append("g").attr("class","x axis")
-            .attr("transform","translate(0,"+height+")")
-            .call(xAxis);
-
-        g.append("g").attr("class","y axis")
-            .call(yAxis);
-    }
-
-    if (preData != undefined){
-        updateWithJSON(preData);
-    }
-    else {
-        d3.json("/timeseries/" + id, function (error, data) {
-            updateWithJSON(data);
+    for(var i = 0; i < data.similar_ids.length; ++i){
+        a = data.similar_ts[i].time_points;
+        b =data.similar_ts[i].data_points;
+        var c = a.map(function (e, i) {
+            return [e, b[i]];
         });
+
+        currLabel = "Sim "+(i+1);
+
+        flotData[i] = {label: currLabel, data: c};
+
+        //$.plot($("#placeholder"), [c]);
+
     }
+    console.log("### Flot2 Final Data ###");
+    console.log(flotData);
+    $.plot($("#placeholder"), flotData);
+
 }
+
+
+
+//var d1 = [[0, .01], [.25, .80], [.5, .6], [.75, .3], [1, .69]];
