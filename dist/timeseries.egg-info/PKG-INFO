@@ -28,17 +28,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 Description: # CS207 Team 3 Time Series Library
         
-        # TODO: Someone update this to include storagemanager/smtimeseries
-        
         [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
         
         A library for working with time series.
         
         A time series is an ordered series of data point indexed by or associated with time points. See [Wikipedia](https://en.wikipedia.org/wiki/Time_series) for more information.
         
-        The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points. The following diagram show the class hierarchy:
+        The time series library is organized into a tree hierarchy. All time series are iterable. Classes that implement SizedContainerTimeSeriesInterface store data in an underlying data structure. Classes implementing StreamTimeSeriesInterface deal with data in on-line fashion without storing specific time and data points.   
         
-        ![Class Hierarchy](images/class_hierarchy.png "Class Hierarchy")
+        StorageManagerInterface is a an interface for managing persistent storage of time series under an identifier.
+        
+        SMTimeSeries implements the SizedContainerTimeSeriesInterface using a StorageManager for storage. If no `ident` is supplied, identical time series will receive the same identifier.
         
         ## Examples
         
@@ -128,18 +128,6 @@ Description: # CS207 Team 3 Time Series Library
         	sts = SimulatedTimeSeries(iter(range(10))
         	print([pt for pt in sts.iteritems()])
         	>>> [(1478057746, 0), (1478057746, 1), (1478057746, 2), (1478057746, 3), (1478057746, 4), (1478057746, 5), (1478057746, 6), (1478057746, 7), (1478057746, 8), (1478057746, 9)]
-        
-        	# How To Run Util Functions
-        	from timeseries.timeseries.util import *
-        
-        	# Generate 1000 Timeseries .dat Files in website/tsdata
-        	genTS()
-        	# Generate 20 Databases in website/tsdb
-        	genDB()
-        	# Get Nearest TS from 20 Databases in website/tsdb
-        	genSIM1("website/tsdata/ts888.dat")
-        	# Get 5 Nearest TS from 20 Databases in website/tsdb
-        	genSIM("website/tsdata/ts888.dat")
         
         ```
         
