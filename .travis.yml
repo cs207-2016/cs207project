@@ -11,6 +11,7 @@ before_install:
     - make sdist
     - pip install ./dist/rbtree-0.1.tar.gz
     - pip install ./dist/timeseries-0.1.tar.gz
+    - pip install ./dist/dbserver-0.1.tar.gz
     - ./init.sh
 script:
     - py.test
