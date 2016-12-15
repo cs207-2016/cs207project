@@ -176,7 +176,7 @@ function visualizeFlot2(orig, data){
 
         currLabel = "Sim "+(i+1);
 
-        flotData[i] = {label: currLabel, data: c};
+        flotData[i+1] = {label: currLabel, data: c};
 
         //$.plot($("#placeholder"), [c]);
 
