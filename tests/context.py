@@ -8,6 +8,7 @@ sys.path.insert(0, path)
 from timeseries.timeseries import *
 from rbtree.rbtree import *
 from timeseries.util import *
+from website import website
 
 # Alias for group 5 tests
 import group5code as tsbtreedb
