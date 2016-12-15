@@ -1,6 +1,4 @@
 
-
-
 var d1 = [[0, 0]];
 
 $(document).ready(function () {
@@ -108,8 +106,6 @@ $(document).ready(function () {
             var result = JSON.parse(e.target.result);
             console.log("### fReader Data ###");
             console.log(result);
-
-            //visualize(undefined, d3.select("#selected-timeseries"), result);
             $.ajax({url:"/simquery", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
             .done(function(msg){
                 //for(var i = 0; i < msg.similar_ids.length && i < 5; ++i){
