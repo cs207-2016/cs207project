@@ -163,7 +163,7 @@ def create_entry():
     logger.debug('Creating TimeseriesEntry')
 
     try:
-        op = TSDBOp_TS(request.json).to_json()
+        op = TSDBOp_putTS(request.json).to_json()
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
         abort(400)
