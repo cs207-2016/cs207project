@@ -18,6 +18,7 @@ sudo useradd -r -s /bin/false dbserver
 sudo mkdir /var/dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
+sudo python3 make_ts.py
 sudo chmod 777 -R /var/dbserver
 sudo chown -R dbserver:dbserver /var/dbserver
 
@@ -25,7 +26,7 @@ sudo chown -R dbserver:dbserver /var/dbserver
 sudo -u postgres bash -c "psql -c \"CREATE USER cs207site WITH PASSWORD 'cs207isthebest';\""
 sudo -u postgres bash -c "createdb -w -O cs207site timeseries"
 sudo -u postgres bash -c "psql -d timeseries -c \"drop table timeseries;\""
-python3 ./populate_postgres.py
+sudo python3 ./populate_postgres.py
 
 # Initialize apache server
 sudo rm -rf /var/www/cs207site
