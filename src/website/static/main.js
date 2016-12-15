@@ -88,7 +88,7 @@ $(document).ready(function () {
             var result = JSON.parse(e.target.result);
             $.ajax({url:"/timeseries", type:"POST", data:JSON.stringify(result), contentType:"application/json"})
             .done(function(msg){
-                visualizeID(msg.id);
+                visualizeFlot2(result,msg);
             });
         };
 
