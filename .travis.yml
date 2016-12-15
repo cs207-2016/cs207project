@@ -7,6 +7,7 @@ before_install:
     - pip install coveralls
     - pip install portalocker 
     - pip install scipy
+    - pip install flask Flask_SQLAlchemy SQLAlchemy
     - make sdist
     - pip install ./dist/rbtree-0.1.tar.gz
     - pip install ./dist/timeseries-0.1.tar.gz
