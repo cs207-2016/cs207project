@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, Float, BigInteger
 import random
 from timeseries.storagemanager import FileStorageManager
 from timeseries.smtimeseries import SMTimeSeries
+from timeseries.util import *
 
 user = 'cs207site'
 password = 'cs207isthebest'
