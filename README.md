@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cs207-2016/cs207project.svg?branch=master)](https://travis-ci.org/cs207-2016/cs207project)
 
-[![Website URL](http://ec2-174-129-135-178.compute-1.amazonaws.com/)]
+[Website URL](http://ec2-174-129-135-178.compute-1.amazonaws.com/)
 
 Team 3:<br>
 Yamini Bansal<br>
