@@ -43,6 +43,10 @@ class FlaskTest:
         resp = self.client.get(endpoint)
         return resp.get_data(as_text=True)
 
+    def post_request(self, endpoint, payload):
+        resp = self.client.post(endpoint, data=payload)
+        return resp.get_data(as_text=True)
+
 '''
 Test of statically served content: index.html
 '''
@@ -67,4 +71,6 @@ def test_css():
 '''
 Test adding a timeseries object via POST
 '''
-# def test_add_ts():
+def test_add_ts():
+    with FlaskTest() as ft:
+        ft.post_request("/timeseries", dict(time_points=[0,1], data_points=[2,3]))
