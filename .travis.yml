@@ -14,7 +14,7 @@ before_install:
     - pip install ./dist/rbtree-0.1.tar.gz
     - pip install ./dist/timeseries-0.1.tar.gz
     - pip install ./dist/dbserver-1.0.tar.gz
-    - sudo sh ./init.sh
+    - sudo sh ./init_travis.sh
 script:
     - py.test
 after_success:
