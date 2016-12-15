@@ -99,6 +99,7 @@ class TSDB_Server(socketserver.BaseServer):
             ids = get_similar_ts_by_id(TSDBOp['id'], 5, DIR_TS_DATA, DIR_TS_DB)
         except KeyError:
             return TSDBOp_Return(TSDBStatus.INVALID_KEY, None)
+
         tslist = [self.get_ts_from_id(idee).to_json() for idee in ids]
         return TSDBOp_Return(TSDBStatus.OK, TSDBOp, json.dumps(tslist))
 

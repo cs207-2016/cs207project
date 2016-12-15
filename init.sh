@@ -19,6 +19,7 @@ sudo mkdir /var/dbserver
 sudo chown dbserver:dbserver /var/dbserver
 sudo cp src/dbserver/dbserver.service /etc/systemd/system
 sudo cp src/dbserver/start_dbserver.py /var/dbserver
+sudo chmod 777 -R /var/dbserver/tsdata /var/dbserver/tsdb
 sudo systemctl daemon-reload
 sudo systemctl enable dbserver.service
 sudo systemctl start dbserver.service
@@ -26,14 +27,17 @@ sudo systemctl start dbserver.service
 # Initialize postgres server
 sudo -u postgres bash -c "psql -c \"CREATE USER cs207site WITH PASSWORD 'cs207isthebest';\""
 sudo -u postgres bash -c "createdb -w -O cs207site timeseries"
+sudo -u postgres bash -c "psql -d timeseries -c \"drop table timeseries;\""
+python3 ./populate_postgres.py
 sudo systemctl enable postgresql.service
 sudo systemctl start postgresql.service
 
 # Initialize apache server
-sudo a2enmod wsgi
+sudo rm -rf /var/www/cs207site
 sudo cp src/website/cs207site.conf /etc/apache2/sites-available
 sudo cp -r src/website /var/www/cs207site
 sudo chown ubuntu:ubuntu -R /var/www/cs207site
 sudo a2ensite cs207site.conf
+sudo a2enmod wsgi
 sudo service apache2 reload
 

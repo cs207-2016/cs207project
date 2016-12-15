@@ -11,3 +11,13 @@ path {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
+
+#placeholder {
+    width: 900px;
+    height: 400px;
+}
+
+div.scroll {
+    height: 200px;
+    overflow: scroll;
+}

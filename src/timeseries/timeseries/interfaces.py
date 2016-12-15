@@ -310,8 +310,8 @@ class SizedContainerTimeSeriesInterface(TimeSeriesInterface):
 
     def to_json(self):
         ret = {}
-        ret['times'] = list(self.itertimes())
-        ret['values'] = list(iter(self))
+        ret['time_points'] = list(self.itertimes())
+        ret['data_points'] = list(iter(self))
         return json.dumps(ret)
     
 class StreamTimeSeriesInterface(TimeSeriesInterface):
