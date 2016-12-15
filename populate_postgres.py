@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import os, os.path
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, Float, BigInteger
 import random
 from timeseries.storagemanager import FileStorageManager
 from timeseries.smtimeseries import SMTimeSeries
+from timeseries.util import *
 
 user = 'cs207site'
 password = 'cs207isthebest'
@@ -67,4 +68,5 @@ if __name__ == '__main__':
                         fpath=filename
                         prod = TimeseriesEntry(id=tsid, blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
                         session.add(prod)
-        session.commit()
+                        session.commit()
+
