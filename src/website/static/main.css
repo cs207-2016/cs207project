@@ -16,3 +16,8 @@ path {
     width: 900px;
     height: 400px;
 }
+
+div.scroll {
+    height: 200px;
+    overflow: scroll;
+}
