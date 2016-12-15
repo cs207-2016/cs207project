@@ -161,19 +161,29 @@ def create_entry():
         abort(400)
         return
     logger.debug('Creating TimeseriesEntry')
+
     try:
-        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
+        op = TSDBOp_TS(request.json).to_json()
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
         abort(400)
         return
+    
+    sock = socket(AF_INET, SOCK_STREAM)
+    sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    sock.connect(('',15001))
+    sock.send(serialize(op))
+    msg = sock.recv(65000)
+    deserializer = Deserializer()
+    deserializer.append(msg)
+    dmsg = deserializer.deserialize()
+    tseries_json =  json.loads(dmsg['op']['ts'])
+    ts = TimeSeries(tseries_json['times'], tseries_json['values'])
+    
     mean = ts.mean()  # Get mean and standard deviation from object
     std = ts.std()
     blarg = random.random()
     level = random.choice(["A", "B", "C", "D", "E", "F"])
-
-    # Save to file and get fpath (replace with storage manager)
-    fpath = save_timeseries_to_file(ts)
 
     # Create TimeseriesEntry
     prod = TimeseriesEntry(blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
@@ -188,7 +198,8 @@ def create_entry():
         "level": level,
         "id" : prod.id
     }
-    return jsonify(result), 201
+
+    return jsonify({"similar_ids": [0], "similar_ts" : [ts.to_json()]})
 
 
 @app.route('/timeseries/<string:timeseries_id>', methods=['GET'])
@@ -259,12 +270,13 @@ def post_simquery():
                     similar_ids = [list of 5 ids]
                 }
     """
+    
     if not request.json or not "time_points" in request.json or not "data_points" in request.json:
         logger.warning("Invalid POST request to simquery")
         abort(400)
         return
+    
     try:
-#        ts = generate_timeseries_from_json(request.json)  # Create actual timeseries object
         op = TSDBOp_withTS(request.json).to_json()
     except Exception as e:
         logger.warning("Could not create timeseries object with exception: %s" % str(e))
