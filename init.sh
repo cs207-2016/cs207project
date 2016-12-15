@@ -6,8 +6,8 @@ fi
 # Fetch dependencies
 sudo apt-get update
 sudo apt-get upgrade
-sudo apt-get install python3 python3-pip postgresql postgresql-contrib apache2 libapache2-mod-wsgi-py3 make
-sudo pip3 install flask Flask_SQLAlchemy setuptools pytest SQLAlchemy
+sudo apt-get install python3 python3-pip postgresql postgresql-contrib apache2 libapache2-mod-wsgi-py3 make libpq-dev python-psycopg2
+sudo pip3 install flask Flask_SQLAlchemy setuptools pytest SQLAlchemy psycopg2
 
 # Build and install our libraries
 make sdist
@@ -37,6 +37,7 @@ sudo rm -rf /var/www/cs207site
 sudo cp src/website/cs207site.conf /etc/apache2/sites-available
 sudo cp -r src/website /var/www/cs207site
 sudo chown ubuntu:ubuntu -R /var/www/cs207site
+sudo a2dissite *.conf
 sudo a2ensite cs207site.conf
 sudo a2enmod wsgi
 sudo service apache2 reload
