@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import os, os.path
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -68,3 +68,15 @@ if __name__ == '__main__':
                         prod = TimeseriesEntry(id=tsid, blarg=blarg, level=level, mean=mean, std=std, fpath=fpath)
                         session.add(prod)
         session.commit()
+
+	DIR_TS_DATA = '/var/dbserver/tsdata'
+	DIR_TS_DB = '/var/dbserver/tsdb'
+
+        # If the random time series haven't yet been generated, generate them
+        if not os.path.exists(DIR_TS_DATA):
+            os.makedirs(DIR_TS_DATA)
+            generate_timeseries(1000, DIR_TS_DATA)
+        if not os.path.exists(DIR_TS_DB):
+            os.makedirs(DIR_TS_DB)
+            generate_vantage_points(20, DIR_TS_DATA, DIR_TS_DB)
+
