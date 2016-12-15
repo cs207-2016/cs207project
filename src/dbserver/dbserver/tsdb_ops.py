@@ -57,6 +57,15 @@ class TSDBOp_withTS(TSDBOp):
     def from_json(cls, json_dict):
         return cls(ts.TimeSeries(json_dict['ts']['time_points'], json_dict['ts']['data_points']))
 
+class TSDBOp_putTS(TSDBOp):
+    def __init__(self, ts):
+        super().__init__('put_ts')
+        self['ts'] = ts
+
+    @classmethod
+    def from_json(cls, json_dict):
+        return cls(ts.TimeSeries(json_dict['ts']['time_points'], json_dict['ts']['data_points']))
+
 class TSDBOp_Return(TSDBOp):
 
     def __init__(self, status, op, payload=None):
@@ -83,4 +92,5 @@ class TSDBOp_withID(TSDBOp):
 typemap = {
   'with_ts': TSDBOp_withTS,
   'with_id': TSDBOp_withID,
+  'put_ts': TSDBOp_putTS,
 }
